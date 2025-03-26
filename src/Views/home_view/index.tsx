@@ -1,90 +1,18 @@
-import { motion } from "framer-motion";
-import { useEffect } from "react";
-import Frame from "../../Components/Frame";
-import { cn } from "../../Lib/class_names";
-import { useWindowing } from "../../Lib/compass_navigator";
-import QAView from "../qa_view";
-import style from "./style.module.css";
-import Trilha01 from "./trilha01.png";
-import Trilha02 from "./trilha02.png";
+import AppFooter from "../../Components/AppFooter";
+import Button from "../../Components/Button";
 
-interface Trilha {
-  titulo: string;
-  modulos: {
-    background: string;
-    titulo: string;
-  }[];
-}
-
-export default function HomeView() {
-  const windowing = useWindowing();
-
-  useEffect(() => {
-    //compass.push(QAView, {});
-    //return () => compass.pop();
-  }, []);
-
-  const trilhas: Trilha[] = [
-    {
-      titulo: "Meu primeiro automóvel",
-      modulos: [
-        { titulo: "Descobrindo o IPVA", background: Trilha01 },
-        { titulo: "Tipos de financiamento", background: Trilha02 },
-      ],
-    },
-    {
-      titulo: "Morar sozinho, e agora?",
-      modulos: [
-        { titulo: "Descobrindo o IPVA", background: Trilha01 },
-        { titulo: "Tipos de financiamento", background: Trilha01 },
-      ],
-    },
-  ];
-
+export default function HomePage() {
   return (
-    <main className="relative h-full w-full overflow-x-hidden overflow-y-scroll bg-white pb-18">
-      <nav className="sticky top-0 z-10 my-8 flex items-center gap-2 border-b border-gray-200 bg-white p-4">
-        <h1 className="text-xl">Home</h1>
+    <main className="bg-grey-1 relative flex h-full w-full flex-col gap-4 overflow-y-scroll font-serif">
+      <nav className="border-grey-8 bg-grey-1 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b p-4">
+        <h1 className="text-xl">Home Page</h1>
       </nav>
-      <Frame className="m-4 flex flex-col items-stretch gap-2 p-2">
-        <h1 className="text-center text-xl font-semibold">Olá, mundo</h1>
-        <p>Seja bem-vindo ao Rumos!</p>
-        <footer className="flex gap-2">
-          <button className="bg-grey-300 shadow-pixel-sm border-grey-800 grow basis-0 border p-2">
-            Cancelar
-          </button>
-          <button className="bg-grey-300 shadow-pixel-sm border-grey-800 grow basis-0 border p-2">
-            Confirmar
-          </button>
-        </footer>
-      </Frame>
-      {trilhas.map((trilha) => (
-        <section className="flex flex-col gap-2 py-2" key={trilha.titulo}>
-          <h2 className="px-4 text-xl">{trilha.titulo}</h2>
-          <ul className="flex h-64 w-full overflow-x-scroll py-2 pb-2 before:mr-4 after:ml-4">
-            {trilha.modulos.map((modulo) => (
-              <motion.li
-                key={modulo.titulo}
-                whileTap={{ scale: 1.05 }}
-                className={cn(
-                  "mr-2 flex aspect-[3/4] h-full shrink-0 flex-col justify-end overflow-hidden rounded-2xl p-4 text-gray-100 shadow-md",
-                  style.trilha_card
-                )}
-                style={{ "--card-bg": `url('${modulo.background}')` }}
-                onClick={() =>
-                  windowing.createWindow({
-                    component: QAView,
-                    props: {},
-                    title: "QA",
-                  })
-                }>
-                <h3 className="w-2/3 text-lg font-semibold">{modulo.titulo}</h3>
-              </motion.li>
-            ))}
-          </ul>
-        </section>
-      ))}
-      <footer className="fixed bottom-0 left-0 z-10 flex h-16 w-full items-center justify-between bg-amber-100 p-2"></footer>
+      <section className="flex flex-col items-stretch gap-2 px-4">
+        <Button className="p-16 text-2xl">Treinamento</Button>
+        <Button className="p-16 text-2xl">Classificação</Button>
+        <Button className="p-16 text-2xl">Sobre o Aplicativo</Button>
+      </section>
+      <AppFooter />
     </main>
   );
 }

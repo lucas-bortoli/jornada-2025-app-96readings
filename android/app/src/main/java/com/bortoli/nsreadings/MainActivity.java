@@ -1,4 +1,4 @@
-package com.bortoli.rumos;
+package com.bortoli.nsreadings;
 
 import com.getcapacitor.BridgeActivity;
 

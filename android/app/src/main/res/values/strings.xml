@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Rumos</string>
-    <string name="title_activity_main">Rumos</string>
-    <string name="package_name">com.bortoli.rumos</string>
-    <string name="custom_url_scheme">com.bortoli.rumos</string>
+    <string name="app_name">96Readings</string>
+    <string name="title_activity_main">96Readings</string>
+    <string name="package_name">com.bortoli.nsreadings</string>
+    <string name="custom_url_scheme">com.bortoli.nsreadings</string>
 </resources>

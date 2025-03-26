@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.bortoli.rumos"
+    namespace "com.bortoli.nsreadings"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.bortoli.rumos"
+        applicationId "com.bortoli.nsreadings"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
