@@ -1,0 +1,16 @@
+.numberInput {
+  background-image: var(--icon-url);
+  background-position: center right var(--icon-margin-right, 4px);
+  background-size: 16px;
+  background-repeat: no-repeat;
+  appearance: none;
+  -moz-appearance: textfield;
+  padding-right: 32px;
+  image-rendering: pixelated;
+}
+
+.numberInput::-webkit-outer-spin-button,
+.numberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

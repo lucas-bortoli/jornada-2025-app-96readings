@@ -31,21 +31,26 @@ const screenVariants = {
   } satisfies Variant,
 };
 
-export default function WindowContainer<P extends object>({
-  window,
-  zIndex,
-}: WindowContainerProps<P>) {
+const noAnimationVariants = {
+  enter: {} satisfies Variant,
+  active: {} satisfies Variant,
+  exit: {} satisfies Variant,
+};
+
+export default function WindowContainer<P extends object>(props: WindowContainerProps<P>) {
+  const variants = props.window.noAnimation ? noAnimationVariants : screenVariants;
+
   return (
     <motion.div
       className="absolute top-0 left-0 h-full w-full"
-      style={{ zIndex }}
-      data-window-key={window.key}
+      style={{ zIndex: props.zIndex }}
+      data-window-key={props.window.key}
       initial="enter"
       animate="active"
       exit="exit"
-      variants={screenVariants}>
-      <CurrentWindowKeyProvider windowKey={window.key}>
-        <window.component {...window.props} />
+      variants={variants}>
+      <CurrentWindowKeyProvider windowKey={props.window.key}>
+        <props.window.component {...props.window.props} />
       </CurrentWindowKeyProvider>
     </motion.div>
   );

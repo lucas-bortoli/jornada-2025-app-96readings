@@ -8,15 +8,11 @@ export interface ButtonProps extends PropsWithChildren, ButtonHTMLAttributes<HTM
 }
 
 export default function Button(props: ButtonProps) {
-  if (!props.title) {
-    console.warn("Button doesn't have an appropriate tooltip.");
-  }
-
   return (
     <button
       {...props}
       className={cn(
-        "bg-grey-0 border-grey-24 text-grey-24 shadow-pixel enabled:hover:shadow-pixel-sm enabled:active:bg-grey-2 disabled:text-grey-8 inline-flex items-center gap-4 border px-4 font-serif select-none enabled:active:translate-x-px enabled:active:translate-y-px enabled:active:shadow-none disabled:border-none disabled:shadow-none",
+        "bg-grey-0 border-grey-800 text-grey-800 shadow-pixel enabled:hover:shadow-pixel-sm enabled:active:bg-grey-50 disabled:text-grey-400 inline-flex h-10 items-center gap-4 border px-4 py-2 font-serif select-none enabled:active:translate-x-px enabled:active:translate-y-px enabled:active:shadow-none disabled:border-none disabled:shadow-none",
         style.button,
         props.className
       )}
