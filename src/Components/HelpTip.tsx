@@ -68,7 +68,7 @@ export default function HelpTip(props: HelpTipProps) {
       {isOpen &&
         createPortal(
           <article
-            className="border-grey-800 bg-grey-0 shadow-pixel-sm fixed w-64 cursor-default border p-2 text-sm !outline-none select-none"
+            className="border-grey-800 bg-grey-0 shadow-pixel-sm fixed w-full max-w-72 cursor-default border p-2 text-sm !outline-none select-none"
             ref={articleRef}>
             <h1 className="font-medium">{props.title}</h1>
             {props.children}

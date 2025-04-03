@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
-import Button from "../../Components/Button";
+import Button, { IconButton } from "../../Components/Button";
 import HelpTip from "../../Components/HelpTip";
 import TextField from "../../Components/TextField";
 import { useWindowing } from "../../Lib/compass_navigator";
@@ -30,8 +30,8 @@ export default function NewClassRegisterView() {
   });
 
   return (
-    <main className="relative flex h-full w-full flex-col gap-4 overflow-y-scroll bg-white font-serif">
-      <nav className="border-grey-800 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b bg-white p-4">
+    <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll font-serif">
+      <nav className="border-grey-800 bg-grey-100 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b p-4">
         <h1 className="text-xl">Criar nova classe</h1>
       </nav>
       <section className="mx-4 flex flex-col items-stretch">
@@ -43,20 +43,37 @@ export default function NewClassRegisterView() {
           placeholder="Nome da classe..."
         />
       </section>
-      <section className="mx-4 flex flex-col items-stretch">
-        <div className="flex items-center justify-between">
-          <span>Dados representativos da classe</span>
-          <HelpTip title="O que são dados representativos?">
-            Dados representativos de uma classe são aqueles que refletem com precisão as
-            características essenciais do grupo ao qual pertencem. Eles devem abranger a diversidade
-            de elementos dentro da classe, garantindo que qualquer análise, modelo estatístico ou
-            algoritmo de inteligência artificial que os utilize possa fazer previsões ou
-            classificações corretas.
-          </HelpTip>
-        </div>
-      </section>
-      <section className="flex justify-end px-4">
-        <Button>Treinar</Button>
+      <section className="mx-4 flex flex-col items-stretch gap-2">
+        <section className="flex flex-col items-center gap-2">
+          <div className="flex w-72 justify-center gap-2">
+            <div className="flex grow basis-0 flex-col items-center gap-2 text-center">
+              <span>Dados salvos</span>
+              <div className="shadow-inset-pixel-xl bg-grey-200 relative my-auto aspect-square w-36 rounded-full border-2">
+                <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center leading-2">
+                  <span className="text-2xl">10000</span>
+                  <br />
+                  <span>entradas</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex grow basis-0 flex-col items-center gap-2 text-center">
+              <span>Dados novos</span>
+              <div className="shadow-inset-pixel-md bg-grey-200 relative my-auto aspect-square w-24 rounded-full border-2">
+                <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center leading-2">
+                  <span>500</span>
+                  <br />
+                  <span className="text-sm">entradas</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <IconButton iconName="Play16" className="mr-4" />
+            <IconButton iconName="Undo16" disabled />
+            <IconButton iconName="Save16" disabled />
+          </div>
+          <span className="text-sm">Use os controles acima para coletar dados.</span>
+        </section>
       </section>
       <AppFooter />
     </main>

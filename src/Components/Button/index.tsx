@@ -1,6 +1,9 @@
 import { ButtonHTMLAttributes, PropsWithChildren, Ref } from "react";
 import { cn } from "../../Lib/class_names";
 import style from "./style.module.css";
+import type { IconName } from "../SpriteIcon";
+import SpriteIcon from "../SpriteIcon";
+import doSwitch from "../../Lib/switch_expression";
 
 export interface ButtonProps extends PropsWithChildren, ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -19,5 +22,27 @@ export default function Button(props: ButtonProps) {
       ref={props.buttonRef}>
       {props.children}
     </button>
+  );
+}
+
+export interface IconButtonProps extends ButtonProps {
+  iconName: IconName;
+  buttonSize?: "small" | "normal";
+  children?: string;
+}
+
+export function IconButton(props: IconButtonProps) {
+  const sizeClass = doSwitch(props.buttonSize ?? "normal", {
+    normal: cn("!h-8 !gap-2", !props.children && "!w-8", props.children && "!px-2"),
+    small: cn("!h-6 !gap-1", !props.children && "!w-6", props.children && "!px-1"),
+  });
+
+  return (
+    <Button
+      {...props}
+      className={cn("inline-flex items-center justify-center !p-0", sizeClass, props.className)}>
+      <SpriteIcon name={props.iconName} />
+      {props.children}
+    </Button>
   );
 }

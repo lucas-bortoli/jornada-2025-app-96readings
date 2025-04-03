@@ -8,6 +8,17 @@ body {
   color: #333;
 }
 
+/* For Chrome, Safari, and newer Edge versions (Webkit-based browsers) */
+::-webkit-scrollbar {
+  display: none; /* Hides the scrollbar */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: none; /* Hides the scrollbar */
+  -ms-overflow-style: none; /* For older Internet Explorer and Edge */
+}
+
 /* https://stackoverflow.com/a/45050338 */
 input,
 textarea,
