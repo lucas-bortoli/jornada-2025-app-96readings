@@ -1,20 +1,20 @@
 import { motion } from "framer-motion";
 import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
-import { useWindowing } from "../../Lib/compass_navigator";
-import NewClassRegisterView from "../new_class_register_form_view";
+import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import { NewClassRegisterWindow } from "../new_class_register_form_view";
 
 export default function TrainingPage() {
   const showAlert = useAlert();
   const windowing = useWindowing();
 
+  useProvideCurrentWindow({
+    backButtonHandler: () => "Ignore",
+  });
+
   function openCreateNewClassPage() {
-    windowing.createWindow({
-      title: "Criar nova classe",
-      component: NewClassRegisterView,
-      props: {},
-      backButton: false, // lidado na própria janela
-    });
+    windowing.createWindow(NewClassRegisterWindow, {});
   }
 
   function trilhaNotAvailable() {
@@ -33,7 +33,7 @@ export default function TrainingPage() {
         <h1 className="text-xl">Treinamento</h1>
       </nav>
       <section>
-        <span className="mx-4">Minhas classes</span>
+        <span className="mx-4">Minzhas clasxxzzsses</span>
         <ul className="flex h-60 w-full gap-2 overflow-x-scroll py-2 before:mr-2 after:ml-2">
           <motion.li
             key="new_class"
@@ -59,3 +59,8 @@ export default function TrainingPage() {
     </main>
   );
 }
+
+export const TrainingPageWindow = manifest(TrainingPage, {
+  initialTitle: () => "Treinamento",
+  hasAnimation: true,
+});

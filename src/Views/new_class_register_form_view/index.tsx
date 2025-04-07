@@ -3,8 +3,8 @@ import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
 import { IconButton } from "../../Components/Button";
 import TextField from "../../Components/TextField";
-import { useWindowing } from "../../Lib/compass_navigator";
-import useCurrentWindowBackButton from "../../Lib/compass_navigator/window_container/use_current_window_back_button";
+import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 
 export default function NewClassRegisterView() {
   const windowing = useWindowing();
@@ -12,22 +12,30 @@ export default function NewClassRegisterView() {
 
   const [className, setClassName] = useState("");
 
-  useCurrentWindowBackButton(async (currentWindowKey) => {
-    const choice = await showAlert({
-      title: "Cancelar criação de classe?",
-      content: <p>Você perderá todos os dados coletados neste formulário!</p>,
-      buttons: { cancel: "Voltar", confirm: "Confirmar" },
-    });
-    if (choice === "cancel") return;
-    setTimeout(() => {
-      windowing.removeSpecificWindow(currentWindowKey);
-    }, 300);
+  const currentWindow = useProvideCurrentWindow({
+    title: "Criação de classe",
+    hasAnimation: true,
+    backButtonHandler: () => {
+      return "DisposeCurrentWindow";
+    },
   });
+
+  //useCurrentWindowBackButton(async (currentWindowKey) => {
+  //  const choice = await showAlert({
+  //    title: "Cancelar criação de classe?",
+  //    content: <p>Você perderá todos os dados coletados neste formulário!</p>,
+  //    buttons: { cancel: "Voltar", confirm: "Confirmar" },
+  //  });
+  //  if (choice === "cancel") return;
+  //  setTimeout(() => {
+  //    windowing.removeSpecificWindow(currentWindowKey);
+  //  }, 300);
+  //});
 
   return (
     <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll font-serif">
       <nav className="border-grey-800 bg-grey-100 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b p-4">
-        <h1 className="text-xl">Criar nova classe</h1>
+        <h1 className="text-xl">{currentWindow?.title}</h1>
       </nav>
       <section className="mx-4 flex flex-col items-stretch">
         <span>Qual será o nome dessa classe?</span>
@@ -74,3 +82,8 @@ export default function NewClassRegisterView() {
     </main>
   );
 }
+
+export const NewClassRegisterWindow = manifest(NewClassRegisterView, {
+  hasAnimation: () => true,
+  initialTitle: () => "Criar nova classe",
+});

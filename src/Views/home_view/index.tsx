@@ -2,18 +2,14 @@ import { useEffect } from "react";
 import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
-import { useWindowing } from "../../Lib/compass_navigator";
-import TrainingPage from "../training_view";
+import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import { TrainingPageWindow } from "../training_view";
 
 export default function HomePage() {
   const windowing = useWindowing();
 
   function openTrainingPage() {
-    windowing.createWindow({
-      title: "Training",
-      component: TrainingPage,
-      props: {},
-    });
+    windowing.createWindow(TrainingPageWindow, {});
   }
 
   const showAlert = useAlert();
@@ -43,3 +39,8 @@ export default function HomePage() {
     </main>
   );
 }
+
+export const HomePageWindow = manifest(HomePage, {
+  initialTitle: () => "Home Page",
+  hasAnimation: true,
+});

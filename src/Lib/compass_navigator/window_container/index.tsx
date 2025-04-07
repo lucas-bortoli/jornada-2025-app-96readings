@@ -2,8 +2,8 @@ import { motion, Variant } from "framer-motion";
 import type { Window } from "..";
 import { CurrentWindowKeyProvider } from "./current_window_key_context";
 
-interface WindowContainerProps<P> {
-  window: Window<P>;
+interface WindowContainerProps<W extends Window<any>> {
+  window: W;
   zIndex: number;
 }
 
@@ -37,8 +37,8 @@ const noAnimationVariants = {
   exit: {} satisfies Variant,
 };
 
-export default function WindowContainer<P extends object>(props: WindowContainerProps<P>) {
-  const variants = props.window.noAnimation ? noAnimationVariants : screenVariants;
+export default function WindowContainer<W extends Window<any>>(props: WindowContainerProps<W>) {
+  const variants = props.window.manifest.hasAnimation ? screenVariants : noAnimationVariants;
 
   return (
     <motion.div

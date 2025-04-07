@@ -1,6 +1,6 @@
 import { App, BackButtonListenerEvent } from "@capacitor/app";
 import { PluginListenerHandle } from "@capacitor/core";
-import { PropsWithChildren, useCallback, useEffect, useMemo, useRef } from "react";
+import { PropsWithChildren, useCallback, useEffect, useRef } from "react";
 import { useMiniGBus } from "./gbus_mini";
 
 export function BackButtonProvider(props: PropsWithChildren) {

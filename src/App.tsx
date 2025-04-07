@@ -1,17 +1,13 @@
 import { useEffect } from "react";
 import { useWindowing } from "./Lib/compass_navigator";
-import HomeView from "./Views/home_view";
+import { HomePageWindow } from "./Views/home_view";
 
 export default function App() {
   const windowing = useWindowing();
 
   useEffect(() => {
-    const key = windowing.createWindow({
-      component: HomeView,
-      props: {},
-      title: "Home View",
-    });
-    return () => windowing.removeSpecificWindow(key);
+    const key = windowing.createWindow(HomePageWindow, {});
+    return () => windowing.removeWindow(key);
   }, []);
 
   return null;

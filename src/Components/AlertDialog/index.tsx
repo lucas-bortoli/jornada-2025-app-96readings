@@ -1,14 +1,15 @@
 import { motion, Variant } from "framer-motion";
 import { useCallback, useEffect, useRef, type PropsWithChildren } from "react";
-import { useWindowing } from "../../Lib/compass_navigator";
+import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 import Deferred from "../../Lib/deferred";
 import { Sequence } from "../../Lib/sequence_generator";
 import Button from "../Button";
 
-interface AlertDialogProps<ActionKeys extends string> extends PropsWithChildren {
+interface AlertDialogProps extends PropsWithChildren {
   title: string;
-  buttons: Record<ActionKeys, string>;
-  onButton: (action: ActionKeys) => void;
+  buttons: Record<string, string>;
+  onButton: (action: string) => void;
 }
 
 const variants = {
@@ -35,7 +36,11 @@ const variants = {
   } satisfies Variant,
 };
 
-function AlertDialog<ActionKeys extends string>(props: AlertDialogProps<ActionKeys>) {
+function AlertDialog<ActionKeys extends string>(props: AlertDialogProps) {
+  useProvideCurrentWindow({
+    backButtonHandler: () => "Ignore",
+  });
+
   return (
     <div className="h-full w-full bg-white/20 backdrop-blur-sm">
       <motion.div
@@ -62,6 +67,11 @@ function AlertDialog<ActionKeys extends string>(props: AlertDialogProps<ActionKe
   );
 }
 
+const AlertDialogWindow = manifest(AlertDialog, {
+  initialTitle: (props) => props.title,
+  hasAnimation: false,
+});
+
 interface AlertConfig<ActionKeys extends string> {
   title: string;
   content: PropsWithChildren["children"];
@@ -77,23 +87,16 @@ export default function useAlert() {
   ): Promise<ActionKeys> {
     const deferred = new Deferred<ActionKeys>();
 
-    const createdWindow = windowing.createWindow<AlertDialogProps<ActionKeys>>({
-      component: AlertDialog,
-      title: "Alert Dialog",
-      props: {
-        title: config.title,
-        buttons: config.buttons,
-        children: config.content,
-        onButton: (action) => {
-          windowing.removeSpecificWindow(createdWindow);
-          alertWindowsRef.current = alertWindowsRef.current.filter((w) => w[0] !== createdWindow);
-          deferred.resolve(action);
-        },
+    const createdWindow = windowing.createWindow(AlertDialogWindow, {
+      title: config.title,
+      buttons: config.buttons,
+      children: config.content,
+      onButton: (action) => {
+        windowing.removeWindow(createdWindow);
+        alertWindowsRef.current = alertWindowsRef.current.filter((w) => w[0] !== createdWindow);
+        deferred.resolve(action as ActionKeys);
       },
-      noAnimation: true,
-      backButton: false,
     });
-
     alertWindowsRef.current.push([createdWindow, deferred]);
 
     return deferred.promise;
@@ -102,7 +105,7 @@ export default function useAlert() {
   useEffect(() => {
     return () => {
       alertWindowsRef.current.forEach((alert) => {
-        windowing.removeSpecificWindow(alert[0]);
+        windowing.removeWindow(alert[0]);
         alert[1].reject("Unmounting...");
       });
     };
