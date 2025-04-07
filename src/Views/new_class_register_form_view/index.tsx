@@ -1,36 +1,36 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
 import { IconButton } from "../../Components/Button";
 import TextField from "../../Components/TextField";
-import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import { manifest } from "../../Lib/compass_navigator";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 
 export default function NewClassRegisterView() {
-  const windowing = useWindowing();
   const showAlert = useAlert();
 
   const [className, setClassName] = useState("");
 
+  const isHandlingBack = useRef(false);
   const currentWindow = useProvideCurrentWindow({
     title: "Criação de classe",
-    hasAnimation: true,
-    backButtonHandler: () => {
-      return "DisposeCurrentWindow";
+    backButtonHandler: (killThisWindow) => {
+      if (isHandlingBack.current) return;
+
+      showAlert({
+        title: "Cancelar criação de classe?",
+        content: <p>Você perderá todos os dados coletados neste formulário!</p>,
+        buttons: { cancel: "Voltar", confirm: "Confirmar" },
+      })
+        .then((choice) => {
+          if (choice === "cancel") return;
+          killThisWindow();
+        })
+        .finally(() => {
+          isHandlingBack.current = false;
+        });
     },
   });
-
-  //useCurrentWindowBackButton(async (currentWindowKey) => {
-  //  const choice = await showAlert({
-  //    title: "Cancelar criação de classe?",
-  //    content: <p>Você perderá todos os dados coletados neste formulário!</p>,
-  //    buttons: { cancel: "Voltar", confirm: "Confirmar" },
-  //  });
-  //  if (choice === "cancel") return;
-  //  setTimeout(() => {
-  //    windowing.removeSpecificWindow(currentWindowKey);
-  //  }, 300);
-  //});
 
   return (
     <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll font-serif">
@@ -84,6 +84,6 @@ export default function NewClassRegisterView() {
 }
 
 export const NewClassRegisterWindow = manifest(NewClassRegisterView, {
-  hasAnimation: () => true,
   initialTitle: () => "Criar nova classe",
+  hasAnimation: true,
 });

@@ -17,11 +17,7 @@ import WindowContainer from "./window_container";
 export type WindowKey = Sequence;
 const makeWindowKey = sequence();
 
-export type BackButtonHandler = (
-  currentWindowKey: WindowKey,
-  dispatch: ActionDispatch<[action: Action]>
-) => BackButtonAction;
-type BackButtonAction = "DisposeCurrentWindow" | "Ignore";
+export type BackButtonHandler = (removeWindow: () => void) => void;
 
 type Component = (props: any) => ReactNode;
 type PropsOf<C extends Component> = Parameters<C>[0] extends undefined ? {} : Parameters<C>[0];
@@ -94,16 +90,15 @@ export function WindowManagerProvider(props: PropsWithChildren) {
   useBackButtonHandler(() => {
     const topmostWindow = state.windows.at(-1);
     if (topmostWindow && state.windows.length >= 2) {
-      const action: BackButtonAction =
-        topmostWindow.backButtonHandler?.current?.(topmostWindow.key, dispatch) ??
-        "DisposeCurrentWindow";
+      const handler = topmostWindow.backButtonHandler?.current;
+      const removeWindow = dispatch.bind(null, { kind: "WmRemoveWindow", key: topmostWindow.key });
 
-      switch (action) {
-        case "Ignore":
-          break;
-        case "DisposeCurrentWindow":
-          dispatch({ kind: "WmRemoveWindow", key: topmostWindow.key });
-          break;
+      if (handler) {
+        // window-defined route handler
+        handler(removeWindow);
+      } else {
+        // default handler: kill window
+        removeWindow();
       }
     }
   });

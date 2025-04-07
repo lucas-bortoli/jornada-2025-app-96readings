@@ -9,9 +9,7 @@ export default function TrainingPage() {
   const showAlert = useAlert();
   const windowing = useWindowing();
 
-  useProvideCurrentWindow({
-    backButtonHandler: () => "Ignore",
-  });
+  useProvideCurrentWindow({});
 
   function openCreateNewClassPage() {
     windowing.createWindow(NewClassRegisterWindow, {});
