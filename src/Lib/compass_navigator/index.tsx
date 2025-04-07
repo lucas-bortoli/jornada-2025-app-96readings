@@ -8,8 +8,8 @@ import {
   useMemo,
   useReducer,
 } from "react";
+import { useBackButtonHandler } from "../back_button";
 import sequence, { Sequence } from "../sequence_generator";
-import useBackButton from "./use_back_button";
 import WindowContainer from "./window_container";
 
 export type WindowKey = Sequence;
@@ -74,7 +74,7 @@ const context = createContext<{ state: State; dispatch: Dispatch<Action> }>({
 export function WindowManagerProvider(props: PropsWithChildren) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  useBackButton(() => {
+  useBackButtonHandler(() => {
     const topmostWindow = state.windows.at(-1);
     if (topmostWindow && state.windows.length > 1 && topmostWindow.backButton) {
       dispatch({ kind: "WmRemoveWindow", key: topmostWindow.key });

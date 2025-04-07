@@ -1,0 +1,7 @@
+.combobox {
+  background-image: var(--icon-url);
+  background-position: center right var(--icon-margin-right, 8px);
+  background-size: 16px;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}

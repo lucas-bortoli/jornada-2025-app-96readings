@@ -1,11 +1,14 @@
 import { cn } from "../../Lib/class_names";
-import IconQuestion16 from "./Question16.png";
-import IconSpinnerArrow16 from "./SpinnerArrow16.png";
-import IconPlay16 from "./Play16.png";
+import IconCheck16 from "./Check16.png";
+import IconDropdownArrow16 from "./DropdownArrow16.png";
 import IconPause16 from "./Pause16.png";
+import IconPlay16 from "./Play16.png";
+import IconQuestion16 from "./Question16.png";
+import IconRadioButtonFilled16 from "./RadioButtonFilled16.png";
+import IconSave16 from "./Save16.png";
+import IconSpinnerArrow16 from "./SpinnerArrow16.png";
 import IconStop16 from "./Stop16.png";
 import IconUndo16 from "./Undo16.png";
-import IconSave16 from "./Save16.png";
 
 const Icons = {
   SpinnerArrow16: [IconSpinnerArrow16, 16],
@@ -15,6 +18,9 @@ const Icons = {
   Stop16: [IconStop16, 16],
   Undo16: [IconUndo16, 16],
   Save16: [IconSave16, 16],
+  Check16: [IconCheck16, 16],
+  DropdownArrow16: [IconDropdownArrow16, 16],
+  RadioButtonFilled16: [IconRadioButtonFilled16, 16],
 } as const;
 
 export type IconName = keyof typeof Icons;
