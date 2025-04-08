@@ -2,17 +2,17 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
-import SpriteIcon from "../../Components/SpriteIcon";
 import { useToast } from "../../Components/Toast";
 import ToggleButton from "../../Components/ToggleButton";
 import { cn } from "../../Lib/class_names";
-import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import { useWindowing } from "../../Lib/compass_navigator";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 import Run from "../../Lib/run";
 import doSwitch from "../../Lib/switch_expression";
 import { useStateSet } from "../../Lib/use_map_set";
 import useUpdateEffect from "../../Lib/use_update_effect";
 import { NewClassRegisterWindow } from "../new_class_register_form_view";
+import { TrainingWindow } from "./windows";
 
 export default function NewEstimatorPage() {
   const showToast = useToast();
@@ -40,6 +40,10 @@ export default function NewEstimatorPage() {
         duration: "shortest",
       });
     }
+  }
+
+  function startTraining() {
+    windowing.createWindow(TrainingWindow, {});
   }
 
   const [networkSize, setNetworkSize] = useState<1 | 2 | 3>(2);
@@ -85,7 +89,6 @@ export default function NewEstimatorPage() {
       <section>
         <header className="flex items-center">
           <span className="mx-4">Complexidade da Rede</span>
-          <SpriteIcon name="Question16" />
         </header>
         <div className="flex gap-2 px-4">
           <div className="flex max-w-sm grow flex-col">
@@ -132,14 +135,9 @@ export default function NewEstimatorPage() {
         </div>
       </section>
       <section className="flex justify-end px-4">
-        <Button>Iniciar treinamento</Button>
+        <Button onClick={startTraining}>Iniciar treinamento</Button>
       </section>
       <AppFooter />
     </main>
   );
 }
-
-export const NewEstimatorPageWindow = manifest(NewEstimatorPage, {
-  initialTitle: () => "Novo Estimador",
-  hasAnimation: true,
-});

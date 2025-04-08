@@ -55,7 +55,6 @@ function AlertDialog<ActionKeys extends string>(props: AlertDialogProps) {
           {Object.entries(props.buttons).map(([action, label]) => (
             <Button
               key={action}
-              className="basis-0"
               onClick={() => props.onButton(action as ActionKeys)}
               title="Dialog Action">
               {label as string}

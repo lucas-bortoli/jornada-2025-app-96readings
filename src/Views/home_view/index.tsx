@@ -1,7 +1,7 @@
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
-import { NewEstimatorPageWindow } from "../training_view/setup_form";
+import { NewEstimatorPageWindow } from "../training_view/windows";
 
 export default function HomePage() {
   const windowing = useWindowing();
