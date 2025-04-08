@@ -1,5 +1,8 @@
 export type Sequence = number & { _tag?: "sequence" };
 
+/**
+ * A simple sequence generator for creating unique keys.
+ */
 export default function sequence(start: number = 0) {
   let value = start;
 

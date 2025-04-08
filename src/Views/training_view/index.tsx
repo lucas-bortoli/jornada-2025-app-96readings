@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
 import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
+import { cn } from "../../Lib/class_names";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import { useStateSet } from "../../Lib/use_map_set";
 import { NewClassRegisterWindow } from "../new_class_register_form_view";
 
 export default function TrainingPage() {
   const showAlert = useAlert();
   const windowing = useWindowing();
+  const [selectedClasses, mutateSelectedClasses] = useStateSet<number>(() => new Set([1]));
 
   useProvideCurrentWindow({});
 
@@ -41,12 +44,15 @@ export default function TrainingPage() {
             <h3 className="text-lg font-semibold">Nova classe</h3>
             <span className="text-sm">Coletar amostras para uma nova classe</span>
           </motion.li>
-          {[0, 1].map((card) => (
+          {[0, 1, 2, 3].map((card) => (
             <motion.li
               key={card}
-              whileTap={{ scale: 1.05 }}
-              className="shadow-pixel-sm border-grey-800 flex aspect-[3/4] h-full shrink-0 flex-col justify-end overflow-hidden border bg-white p-2"
-              onClick={trilhaNotAvailable}>
+              className={cn(
+                "border-grey-800 flex aspect-[3/4] h-full shrink-0 flex-col justify-end overflow-hidden border p-2",
+                !selectedClasses.has(card) && "shadow-pixel-sm bg-white",
+                selectedClasses.has(card) && "bg-grey-100 translate-x-px translate-y-px shadow-none"
+              )}
+              onClick={() => mutateSelectedClasses.toggle(card)}>
               <h3 className="text-lg font-semibold">Classe</h3>
               <span className="text-sm">3 amostras</span>
             </motion.li>
