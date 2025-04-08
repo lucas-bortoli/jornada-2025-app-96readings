@@ -1,14 +1,14 @@
-export type Sequence = number & { _tag?: "sequence" };
+export type Sequence<T = any> = number & { _tag?: "sequence"; _tag2?: T };
 
 /**
  * A simple sequence generator for creating unique keys.
  */
-export default function sequence(start: number = 0) {
+export default function sequence<S extends Sequence = Sequence>(start: number = 0) {
   let value = start;
 
-  return function next(): Sequence {
+  return function next(): S {
     value++;
-    return value;
+    return value as S;
   };
 }
 

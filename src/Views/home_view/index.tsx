@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
@@ -11,15 +9,6 @@ export default function HomePage() {
   function openTrainingPage() {
     windowing.createWindow(TrainingPageWindow, {});
   }
-
-  const showAlert = useAlert();
-  useEffect(() => {
-    showAlert({
-      title: "Olá",
-      content: "Hello World",
-      buttons: { ok: "OK" },
-    });
-  }, []);
 
   return (
     <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll font-serif">

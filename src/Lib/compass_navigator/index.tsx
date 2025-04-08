@@ -1,6 +1,5 @@
 import { AnimatePresence } from "framer-motion";
 import {
-  ActionDispatch,
   createContext,
   Dispatch,
   PropsWithChildren,
@@ -113,7 +112,7 @@ export function WindowsOutlet() {
   const windows = state.windows.slice().toSorted((a, b) => a.key - b.key);
 
   return (
-    <div className="relative z-0 h-[100lvh] w-[100lvw] overflow-hidden">
+    <div data-windows-outlet="" className="relative z-0 h-full w-full overflow-hidden">
       <AnimatePresence>
         {windows.map((window, index) => {
           return <WindowContainer key={window.key} window={window} zIndex={index} />;

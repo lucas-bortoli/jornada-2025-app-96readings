@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
+import { useToast } from "../../Components/Toast";
 import { cn } from "../../Lib/class_names";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
@@ -8,24 +8,31 @@ import { useStateSet } from "../../Lib/use_map_set";
 import { NewClassRegisterWindow } from "../new_class_register_form_view";
 
 export default function TrainingPage() {
-  const showAlert = useAlert();
+  const showToast = useToast();
   const windowing = useWindowing();
   const [selectedClasses, mutateSelectedClasses] = useStateSet<number>(() => new Set([1]));
 
-  useProvideCurrentWindow({});
+  useProvideCurrentWindow({
+    title: ["Treinamento", `${selectedClasses} classes selecionadas`].join(" - "),
+  });
 
   function openCreateNewClassPage() {
     windowing.createWindow(NewClassRegisterWindow, {});
   }
 
-  function trilhaNotAvailable() {
-    showAlert({
-      title: "Trilha indisponível",
-      content: (
-        <p>Desculpe, essa trilha está indisponível na versão de demonstração do aplicativo.</p>
-      ),
-      buttons: { ok: "OK" },
-    });
+  function toggleTrainingClass(card: number) {
+    mutateSelectedClasses.toggle(card);
+    if (selectedClasses.has(card)) {
+      showToast({
+        content: "A classe será incluída no treinamento.",
+        duration: "shortest",
+      });
+    } else {
+      showToast({
+        content: "A classe será excluída no treinamento.",
+        duration: "shortest",
+      });
+    }
   }
 
   return (
@@ -52,7 +59,7 @@ export default function TrainingPage() {
                 !selectedClasses.has(card) && "shadow-pixel-sm bg-white",
                 selectedClasses.has(card) && "bg-grey-100 translate-x-px translate-y-px shadow-none"
               )}
-              onClick={() => mutateSelectedClasses.toggle(card)}>
+              onClick={toggleTrainingClass.bind(null, card)}>
               <h3 className="text-lg font-semibold">Classe</h3>
               <span className="text-sm">3 amostras</span>
             </motion.li>
