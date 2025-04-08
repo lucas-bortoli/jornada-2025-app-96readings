@@ -1,13 +1,13 @@
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
-import { TrainingPageWindow } from "../training_view";
+import { NewEstimatorPageWindow } from "../training_view/setup_form";
 
 export default function HomePage() {
   const windowing = useWindowing();
 
   function openTrainingPage() {
-    windowing.createWindow(TrainingPageWindow, {});
+    windowing.createWindow(NewEstimatorPageWindow, {});
   }
 
   return (
