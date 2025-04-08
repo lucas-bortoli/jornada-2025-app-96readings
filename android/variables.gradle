@@ -3,7 +3,8 @@ ext {
     compileSdkVersion = 35
     targetSdkVersion = 35
     androidxActivityVersion = '1.9.2'
-    androidxAppCompatVersion = '1.7.0'
+    // Mudado de '1.7.0' para '1.6.1' por causa de uma falha de compilação: https://github.com/ionic-team/capacitor/issues/7866#issuecomment-2700395400
+    androidxAppCompatVersion = '1.6.1'
     androidxCoordinatorLayoutVersion = '1.2.0'
     androidxCoreVersion = '1.15.0'
     androidxFragmentVersion = '1.8.4'
