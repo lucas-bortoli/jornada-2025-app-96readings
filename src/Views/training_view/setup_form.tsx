@@ -46,7 +46,7 @@ export default function NewEstimatorPage() {
     windowing.createWindow(TrainingWindow, {});
   }
 
-  const [networkSize, setNetworkSize] = useState<1 | 2 | 3>(2);
+  const [networkSize, setNetworkSize] = useState<0 | 1 | 2 | 3>(2);
 
   useUpdateEffect(() => {
     showToast({
@@ -94,6 +94,12 @@ export default function NewEstimatorPage() {
           <div className="flex max-w-sm grow flex-col">
             <ToggleButton
               className="justify-center"
+              checked={networkSize === 0}
+              onClick={setNetworkSize.bind(null, 0)}>
+              Mini
+            </ToggleButton>
+            <ToggleButton
+              className="justify-center"
               checked={networkSize === 1}
               onClick={setNetworkSize.bind(null, 1)}>
               Pequena
@@ -112,9 +118,16 @@ export default function NewEstimatorPage() {
             </ToggleButton>
           </div>
           <div className="relative h-40 w-40">
-            <div className="border-grey-500 absolute top-1/2 left-1/2 aspect-square h-full -translate-x-1/2 -translate-y-1/2 border border-dashed" />
+            {[0.1, 0.3, 0.6, 1].map((scale) => (
+              <div
+                key={scale}
+                className="border-grey-500 absolute top-1/2 left-1/2 aspect-square h-full -translate-x-1/2 -translate-y-1/2 border border-dashed"
+                style={{ scale }}
+              />
+            ))}
             {Run(() => {
               const scale = doSwitch(networkSize, {
+                [0]: 0.1,
                 [1]: 0.3,
                 [2]: 0.6,
                 [3]: 1,
