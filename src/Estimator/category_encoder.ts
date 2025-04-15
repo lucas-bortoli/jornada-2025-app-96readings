@@ -26,6 +26,10 @@ export default class CategoryEncoder {
     this.decoded = new Map(uniqueFeatures.map((f, hotIdx) => [hotIdx, f] as const));
   }
 
+  get categoryCount() {
+    return this.encoded.size;
+  }
+
   /**
    * Encodes a feature string into a one-hot vector.
    * @param feature The feature string to encode.
