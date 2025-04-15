@@ -9,6 +9,17 @@ export default function doSwitch<T extends string | number | symbol, U>(
   return obj[value];
 }
 
+type SwitchDelegateObject<T extends string | number | symbol, U> = {
+  [key in T]: () => U;
+};
+
+export function doSwitchDelegate<T extends string | number | symbol, U>(
+  value: T,
+  obj: SwitchDelegateObject<T, U>
+): U {
+  return obj[value]();
+}
+
 type SwitchObjectWithDefault<T extends string | number | symbol, U> = {
   [key in T]?: U;
 } & {
