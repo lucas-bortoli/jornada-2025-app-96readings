@@ -1,4 +1,4 @@
-import { ImperativeObject } from "../Lib/imperative_object";
+import { ImperativeObject, notifyUpdate } from "../Lib/imperative_object";
 import generateUUID from "../Lib/uuid";
 import CategoryEncoder from "./category_encoder";
 import { shuffleArray } from "./rng_awful";
@@ -35,8 +35,10 @@ export interface Progress {
    * All epochs the training underwent so far. The current epoch is the last item in the array.
    */
   epochs: Epoch[];
+}
 
-  signal: AbortSignal;
+export function progressPercentage(progress: Progress) {
+  return progress.epochs.length / (progress.totalEpochs + 1);
 }
 
 export default class TrainingCycle implements ImperativeObject {
@@ -67,7 +69,7 @@ export default class TrainingCycle implements ImperativeObject {
       state: "StillTraining",
       dataset: { train, test },
       totalEpochs: estimateEpochs(
-        0.5,
+        0.1,
         this.estimator.countParams(),
         train.length,
         X(dataset[0]).length,
@@ -75,5 +77,9 @@ export default class TrainingCycle implements ImperativeObject {
       ),
       epochs: [],
     };
+
+    notifyUpdate(this);
   }
+
+  stop() {}
 }

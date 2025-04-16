@@ -1,11 +1,40 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import useAlert from "../../Components/AlertDialog";
 import { useToast } from "../../Components/Toast";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import TrainingCycle, { progressPercentage } from "../../Estimator/training_cycle";
+import { EstimatorVariant } from "../../Estimator/training/model_templates";
+import Run from "../../Lib/run";
+import useImperativeObject from "../../Lib/imperative_object";
 
-export default function Training() {
+interface TrainingProps {
+  variant: EstimatorVariant;
+}
+
+export default function Training(props: TrainingProps) {
   const showAlert = useAlert();
   const showToast = useToast();
+
+  const training = useImperativeObject(() => new TrainingCycle(props.variant));
+
+  useEffect(() => {
+    training.startTraining([
+      [0, 0, 0, 0, 0, "air"],
+      [0, 0, 0, 0, 0, "air"],
+      [0, 0, 0, 0, 0, "air"],
+      [0, 0, 0, 0, 0, "air"],
+      [0, 0, 0, 0, 0, "coffee"],
+      [0, 0, 0, 0, 0, "air"],
+      [0, 0, 0, 0, 0, "coffee"],
+      [0, 0, 0, 0, 0, "coffee"],
+      [0, 0, 0, 0, 0, "air"],
+      [0, 0, 0, 0, 0, "coffee"],
+    ]);
+
+    return () => {
+      training.stop();
+    };
+  }, [training]);
 
   const isHandlingBackButton = useRef(false);
   useProvideCurrentWindow({
@@ -40,26 +69,38 @@ export default function Training() {
         <h1 className="text-xl">Treinamento</h1>
       </nav>
       <div className="relative flex shrink grow flex-col items-center justify-center gap-4 p-4">
-        <h1 className="text-6xl">10%</h1>
-        <p>Época 1 de 10</p>
-        <section className="bg-grey-50 border-grey-800 shadow-pixel-sm flex w-3/4 max-w-sm flex-col gap-2 border p-4">
-          <table>
-            <tbody>
-              <tr>
-                <td>Tempo total</td>
-                <td className="text-end">2min, 10s</td>
-              </tr>
-              <tr>
-                <td>Loss</td>
-                <td className="text-end font-mono text-lg">0.432</td>
-              </tr>
-              <tr>
-                <td>Acurácia</td>
-                <td className="text-end font-mono text-lg">0.210</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
+        {Run(() => {
+          if (training.progress === null) {
+            return <h1 className="text-center text-2xl">Iniciando treinamento...</h1>;
+          }
+
+          return (
+            <>
+              <h1 className="text-6xl">{progressPercentage(training.progress)}%</h1>
+              <p>
+                Época {training.progress.epochs.length} de {training.progress.totalEpochs}
+              </p>
+              <section className="bg-grey-50 border-grey-800 shadow-pixel-sm flex w-3/4 max-w-sm flex-col gap-2 border p-4">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>Tempo total</td>
+                      <td className="text-end">2min, 10s</td>
+                    </tr>
+                    <tr>
+                      <td>Loss</td>
+                      <td className="text-end font-mono text-lg">0.432</td>
+                    </tr>
+                    <tr>
+                      <td>Acurácia</td>
+                      <td className="text-end font-mono text-lg">0.210</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+            </>
+          );
+        })}
       </div>
     </div>
   );

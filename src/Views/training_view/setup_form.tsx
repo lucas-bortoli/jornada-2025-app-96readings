@@ -13,6 +13,7 @@ import { useStateSet } from "../../Lib/use_map_set";
 import useUpdateEffect from "../../Lib/use_update_effect";
 import { NewClassRegisterWindow } from "../new_class_register_form_view";
 import { TrainingWindow } from "./windows";
+import { EstimatorVariant } from "../../Estimator/training/model_templates";
 
 export default function NewEstimatorPage() {
   const showToast = useToast();
@@ -42,10 +43,6 @@ export default function NewEstimatorPage() {
     }
   }
 
-  function startTraining() {
-    windowing.createWindow(TrainingWindow, {});
-  }
-
   const [networkSize, setNetworkSize] = useState<0 | 1 | 2 | 3>(2);
 
   useUpdateEffect(() => {
@@ -54,6 +51,17 @@ export default function NewEstimatorPage() {
       duration: "shortest",
     });
   }, [networkSize]);
+
+  function startTraining() {
+    windowing.createWindow(TrainingWindow, {
+      variant: doSwitch(networkSize, {
+        0: "mini",
+        1: "small",
+        2: "medium",
+        3: "large",
+      }) satisfies EstimatorVariant,
+    });
+  }
 
   return (
     <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll font-serif">
