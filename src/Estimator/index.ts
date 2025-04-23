@@ -1,4 +1,5 @@
-import CategoryEncoder from "./category_encoder";
+import * as tf from "@tensorflow/tfjs";
+import LabelEncoder from "./label_encoder";
 import { shuffleArray } from "./rng_awful";
 import datasetUrl from "./sample_data.tsv?url";
 import trainTestSplit from "./train_test_split";
@@ -22,8 +23,10 @@ console.log(dataset);
 //@ts-expect-error
 window.dataset = dataset;
 //@ts-expect-error
-window.CategoryEncoder = CategoryEncoder;
+window.LabelEncoder = LabelEncoder;
 //@ts-expect-error
 window.trainTestSplit = trainTestSplit;
 //@ts-expect-error
 window.shuffleArray = shuffleArray;
+//@ts-expect-error
+window.tf = tf;

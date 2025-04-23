@@ -7,40 +7,49 @@ export type EstimatorVariant = "mini" | "small" | "medium" | "large";
  * The model is designed for multi-class classification with 4 input features.
  *
  * @param size The size of the model to create.
+ * @param numClasses How many classes will this model learn? This information is important for the model's output layer.
  * @returns A TensorFlow.js sequential model.
  */
-export default function makeEstimator(size: EstimatorVariant) {
+export default function makeEstimator(size: EstimatorVariant, numClasses: number) {
   const model = tf.sequential();
 
   switch (size) {
     case "mini":
       model.add(
-        tf.layers.dense({ units: 8, activation: "relu", inputShape: [4], name: `layer1_${size}` })
+        tf.layers.dense({ units: 8, activation: "relu", inputShape: [5], name: `layer1_${size}` })
       );
       model.add(tf.layers.dense({ units: 4, activation: "relu", name: `layer2_${size}` }));
-      model.add(tf.layers.dense({ units: 1, activation: "softmax", name: `output_${size}` }));
+      model.add(
+        tf.layers.dense({ units: numClasses, activation: "softmax", name: `output_${size}` })
+      );
       break;
     case "small":
       model.add(
-        tf.layers.dense({ units: 16, activation: "relu", inputShape: [4], name: `layer1_${size}` })
+        tf.layers.dense({ units: 16, activation: "relu", inputShape: [5], name: `layer1_${size}` })
       );
       model.add(tf.layers.dense({ units: 8, activation: "relu", name: `layer2_${size}` }));
-      model.add(tf.layers.dense({ units: 1, activation: "softmax", name: `output_${size}` }));
+      model.add(
+        tf.layers.dense({ units: numClasses, activation: "softmax", name: `output_${size}` })
+      );
       break;
     case "medium":
       model.add(
-        tf.layers.dense({ units: 32, activation: "relu", inputShape: [4], name: `layer1_${size}` })
+        tf.layers.dense({ units: 32, activation: "relu", inputShape: [5], name: `layer1_${size}` })
       );
       model.add(tf.layers.dense({ units: 16, activation: "relu", name: `layer2_${size}` }));
-      model.add(tf.layers.dense({ units: 1, activation: "softmax", name: `output_${size}` }));
+      model.add(
+        tf.layers.dense({ units: numClasses, activation: "softmax", name: `output_${size}` })
+      );
       break;
     case "large":
       model.add(
-        tf.layers.dense({ units: 64, activation: "relu", inputShape: [4], name: `layer1_${size}` })
+        tf.layers.dense({ units: 64, activation: "relu", inputShape: [5], name: `layer1_${size}` })
       );
       model.add(tf.layers.dense({ units: 32, activation: "relu", name: `layer2_${size}` }));
       model.add(tf.layers.dense({ units: 16, activation: "relu", name: `layer3_${size}` }));
-      model.add(tf.layers.dense({ units: 1, activation: "softmax", name: `output_${size}` }));
+      model.add(
+        tf.layers.dense({ units: numClasses, activation: "softmax", name: `output_${size}` })
+      );
       break;
   }
 

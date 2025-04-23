@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: "96Readings",
   webDir: "dist",
   server: {
-    url: "http://localhost:5173",
+    // url: "http://localhost:5173",
     cleartext: true,
   },
   android: {

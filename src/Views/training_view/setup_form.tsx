@@ -4,6 +4,7 @@ import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
 import { useToast } from "../../Components/Toast";
 import ToggleButton from "../../Components/ToggleButton";
+import { EstimatorVariant } from "../../Estimator/training/model_templates";
 import { cn } from "../../Lib/class_names";
 import { useWindowing } from "../../Lib/compass_navigator";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
@@ -13,7 +14,6 @@ import { useStateSet } from "../../Lib/use_map_set";
 import useUpdateEffect from "../../Lib/use_update_effect";
 import { NewClassRegisterWindow } from "../new_class_register_form_view";
 import { TrainingWindow } from "./windows";
-import { EstimatorVariant } from "../../Estimator/training/model_templates";
 
 export default function NewEstimatorPage() {
   const showToast = useToast();
@@ -53,6 +53,13 @@ export default function NewEstimatorPage() {
   }, [networkSize]);
 
   function startTraining() {
+    if (selectedClasses.size < 2) {
+      return showToast({
+        content: "É preciso selecionar pelo menos duas classes para o modelo.",
+        duration: "shortest",
+      });
+    }
+
     windowing.createWindow(TrainingWindow, {
       variant: doSwitch(networkSize, {
         0: "mini",
@@ -60,6 +67,7 @@ export default function NewEstimatorPage() {
         2: "medium",
         3: "large",
       }) satisfies EstimatorVariant,
+      numClasses: selectedClasses.size,
     });
   }
 

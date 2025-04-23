@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { gbus, useMiniGBus } from "./gbus_mini";
 
+export type ObjectUUID = string & { _tag?: "objectUUID" };
+
 /**
  * Represents an imperative object with a unique identifier.
  * Can optionally define a cleanup function that runs on unmount.
  */
 export interface ImperativeObject {
   /** Unique identifier for the imperative object */
-  uuid: string;
+  uuid: ObjectUUID;
   /** Optional cleanup function executed when the object is unmounted */
   onUnmount?: () => void;
 }
@@ -48,8 +50,10 @@ export default function useImperativeObject<O extends ImperativeObject>(factory:
 /**
  * Notifies the system that an imperative object has been externally updated.
  *
- * @param object - The object that was mutated
+ * @param object - The object or object ID that was mutated
  */
-export function notifyUpdate(object: ImperativeObject): void {
-  gbus.publish("imperativeUpdate", { objectUUID: object.uuid });
+export function notifyUpdate(object: ImperativeObject | ObjectUUID): void {
+  gbus.publish("imperativeUpdate", {
+    objectUUID: typeof object === "string" ? object : object.uuid,
+  });
 }

@@ -1,35 +1,61 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useAlert from "../../Components/AlertDialog";
 import { useToast } from "../../Components/Toast";
-import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
-import TrainingCycle, { progressPercentage } from "../../Estimator/training_cycle";
 import { EstimatorVariant } from "../../Estimator/training/model_templates";
-import Run from "../../Lib/run";
+import TrainingCycle, { progressPercentage } from "../../Estimator/training_cycle";
+import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import delay from "../../Lib/delay";
 import useImperativeObject from "../../Lib/imperative_object";
+import Run, { RunAsync } from "../../Lib/run";
+import useAbortSignal from "../../Lib/use_abort_signal";
 
 interface TrainingProps {
   variant: EstimatorVariant;
+  numClasses: number;
 }
 
 export default function Training(props: TrainingProps) {
   const showAlert = useAlert();
   const showToast = useToast();
 
-  const training = useImperativeObject(() => new TrainingCycle(props.variant));
+  const training = useImperativeObject(() => new TrainingCycle(props.variant, props.numClasses));
+
+  const pageAbortSignal = useAbortSignal();
 
   useEffect(() => {
-    training.startTraining([
-      [0, 0, 0, 0, 0, "air"],
-      [0, 0, 0, 0, 0, "air"],
-      [0, 0, 0, 0, 0, "air"],
-      [0, 0, 0, 0, 0, "air"],
-      [0, 0, 0, 0, 0, "coffee"],
-      [0, 0, 0, 0, 0, "air"],
-      [0, 0, 0, 0, 0, "coffee"],
-      [0, 0, 0, 0, 0, "coffee"],
-      [0, 0, 0, 0, 0, "air"],
-      [0, 0, 0, 0, 0, "coffee"],
-    ]);
+    RunAsync(async () => {
+      await delay(500);
+
+      if (pageAbortSignal.aborted) return;
+      showToast({
+        content: "Iniciando treinamento...",
+        duration: "long",
+      });
+
+      await delay(500);
+
+      if (pageAbortSignal.aborted) return;
+      training.startTraining([
+        [0, 0.8, 0, 0, 0, "air"],
+        [0, 0.8, 0, 0, 0, "air"],
+        [0, 0.8, 0, 0, 0, "air"],
+        [0, 0.8, 0, 0, 0, "air"],
+        [0, -0.4, 0, 0, 0, "coffee"],
+        [0, 0.8, 0, 0, 0, "air"],
+        [0, -0.4, 0, 0, 0, "coffee"],
+        [0, -0.4, 0, 0, 0, "coffee"],
+        [0, 0.8, 0, 0, 0, "air"],
+        [0, -0.4, 0, 0, 0, "coffee"],
+      ]);
+
+      while (true) {
+        if (pageAbortSignal.aborted) break;
+
+        // ????
+
+        await delay(500);
+      }
+    });
 
     return () => {
       training.stop();
@@ -55,13 +81,6 @@ export default function Training(props: TrainingProps) {
       killThisWindow();
     },
   });
-
-  useEffect(() => {
-    showToast({
-      content: "Iniciando treinamento...",
-      duration: "long",
-    });
-  }, []);
 
   return (
     <div className="bg-grey-100 flex h-full w-full flex-col font-serif">
