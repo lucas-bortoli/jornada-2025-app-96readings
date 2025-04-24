@@ -18,17 +18,13 @@ export const y = <R extends DatasetRow | DatasetRowEncoded>(xyRow: R) => xyRow[5
 
 export interface Epoch {
   accuracy: number;
+  loss: number;
   startTimestamp: number;
+  endTimestamp: number | null;
 }
 
 export interface Progress {
   state: "StillTraining" | "Complete";
-
-  dataset: {
-    train: DatasetRowEncoded[];
-    test: DatasetRowEncoded[];
-  };
-
   totalEpochs: number;
 
   /**
@@ -38,7 +34,9 @@ export interface Progress {
 }
 
 export function progressPercentage(progress: Progress) {
-  return progress.epochs.length / (progress.totalEpochs + 1);
+  if (progress.totalEpochs === 0) return 0;
+
+  return progress.epochs.length / progress.totalEpochs;
 }
 
 export default class TrainingCycle implements ImperativeObject {
@@ -49,8 +47,8 @@ export default class TrainingCycle implements ImperativeObject {
   public progress: Progress | null;
 
   constructor(variant: EstimatorVariant, numClasses: number) {
-    this.numClasses = numClasses;
-    this.estimator = makeEstimator(variant, numClasses);
+    this.numClasses = 7;
+    this.estimator = makeEstimator(variant, 7);
     this.progress = null;
   }
 
@@ -69,17 +67,52 @@ export default class TrainingCycle implements ImperativeObject {
     const tX = tf.tensor2d(X_values);
     const tY = tf.oneHot(tf.tensor1d(y_values_encoded, "int32"), this.numClasses);
 
+    const totalEpochs = 50;
+
     RunAsync(async (defer) => {
       await this.estimator.fit(tX, tY, {
+        epochs: totalEpochs,
         validationSplit: 0.2,
+        batchSize: 32,
         callbacks: {
-          onEpochBegin: async (epoch, logs) => {
+          onTrainBegin: async (logs) => {
+            console.log("📈 Training has started!", logs);
+
+            this.progress = {
+              state: "StillTraining",
+              totalEpochs,
+              epochs: [],
+            };
+
+            notifyUpdate(this);
+          },
+          onTrainEnd: async (logs) => {
+            console.log("🏁 Training complete!", logs);
+
+            this.progress!.state = "Complete";
+
+            notifyUpdate(this);
+          },
+          onEpochBegin: async (epoch) => {
             console.log(`🚀 Starting epoch ${epoch + 1}`);
+
+            if (this.progress) {
+              const previous = this.progress.epochs.at(-1) ?? null;
+              console.log({ previous });
+              this.progress.epochs.push({
+                accuracy: previous?.accuracy ?? 0,
+                loss: previous?.loss ?? 1,
+                startTimestamp: Date.now(),
+                endTimestamp: null,
+              });
+            }
+
             notifyUpdate(this);
           },
           onEpochEnd: async (epoch, logs) => {
             console.log(
-              `✅ Finished epoch ${epoch + 1} - loss: ${logs?.loss?.toFixed(4)}, val_loss: ${logs?.val_loss?.toFixed(4)}`
+              `✅ Finished epoch ${epoch + 1} - loss: ${logs?.loss?.toFixed(4)}, val_loss: ${logs?.val_loss?.toFixed(4)}`,
+              logs
             );
 
             // condição de early-stopping
@@ -88,20 +121,26 @@ export default class TrainingCycle implements ImperativeObject {
               this.estimator.stopTraining = true;
             }
 
-            notifyUpdate(this);
-          },
-          onTrainBegin: async (logs) => {
-            console.log("📈 Training has started!");
-            notifyUpdate(this);
-          },
-          onTrainEnd: async (logs) => {
-            console.log("🏁 Training complete!");
+            if (this.progress && logs) {
+              const current = this.progress.epochs.at(-1)!;
+
+              current.accuracy = logs.val_acc;
+              current.loss = logs.val_loss;
+              current.endTimestamp = Date.now();
+            }
+
             notifyUpdate(this);
           },
           onBatchEnd: async (batch, logs) => {
             if (batch % 50 === 0) {
-              console.log(`🔄 Batch ${batch} - loss: ${logs?.loss?.toFixed(4)}`);
+              // console.log(`🔄 Batch ${batch} - loss: ${logs?.loss?.toFixed(4)}`, logs);
+
+              if (this.progress && logs) {
+                const current = this.progress.epochs.at(-1)!;
+                current.endTimestamp = Date.now();
+              }
             }
+
             notifyUpdate(this);
           },
         },

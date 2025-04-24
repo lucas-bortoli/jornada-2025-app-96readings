@@ -4,7 +4,7 @@ import { shuffleArray } from "./rng_awful";
 import datasetUrl from "./sample_data.tsv?url";
 import trainTestSplit from "./train_test_split";
 
-const dataset = (await (await fetch(datasetUrl)).text())
+export const dataset = (await (await fetch(datasetUrl)).text())
   .split("\n")
   .slice(1)
   .map(

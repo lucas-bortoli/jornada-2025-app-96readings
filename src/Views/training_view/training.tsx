@@ -8,6 +8,8 @@ import delay from "../../Lib/delay";
 import useImperativeObject from "../../Lib/imperative_object";
 import Run, { RunAsync } from "../../Lib/run";
 import useAbortSignal from "../../Lib/use_abort_signal";
+import TimeProgress from "./components/time_progress";
+import { dataset } from "../../Estimator";
 
 interface TrainingProps {
   variant: EstimatorVariant;
@@ -35,18 +37,7 @@ export default function Training(props: TrainingProps) {
       await delay(500);
 
       if (pageAbortSignal.aborted) return;
-      training.startTraining([
-        [0, 0.8, 0, 0, 0, "air"],
-        [0, 0.8, 0, 0, 0, "air"],
-        [0, 0.8, 0, 0, 0, "air"],
-        [0, 0.8, 0, 0, 0, "air"],
-        [0, -0.4, 0, 0, 0, "coffee"],
-        [0, 0.8, 0, 0, 0, "air"],
-        [0, -0.4, 0, 0, 0, "coffee"],
-        [0, -0.4, 0, 0, 0, "coffee"],
-        [0, 0.8, 0, 0, 0, "air"],
-        [0, -0.4, 0, 0, 0, "coffee"],
-      ]);
+      training.startTraining(dataset);
 
       while (true) {
         if (pageAbortSignal.aborted) break;
@@ -95,7 +86,9 @@ export default function Training(props: TrainingProps) {
 
           return (
             <>
-              <h1 className="text-6xl">{progressPercentage(training.progress)}%</h1>
+              <h1 className="text-6xl">
+                {(progressPercentage(training.progress) * 100).toFixed(0)}%
+              </h1>
               <p>
                 Época {training.progress.epochs.length} de {training.progress.totalEpochs}
               </p>
@@ -104,15 +97,24 @@ export default function Training(props: TrainingProps) {
                   <tbody>
                     <tr>
                       <td>Tempo total</td>
-                      <td className="text-end">2min, 10s</td>
+                      <td className="text-end">
+                        <TimeProgress
+                          startTime={training.progress?.epochs[0]?.startTimestamp}
+                          endTime={training.progress.epochs.at(-1)?.endTimestamp}
+                        />
+                      </td>
                     </tr>
                     <tr>
                       <td>Loss</td>
-                      <td className="text-end font-mono text-lg">0.432</td>
+                      <td className="text-end font-mono text-lg">
+                        {(training.progress?.epochs.at(-1)?.loss ?? 0).toFixed(3)}
+                      </td>
                     </tr>
                     <tr>
                       <td>Acurácia</td>
-                      <td className="text-end font-mono text-lg">0.210</td>
+                      <td className="text-end font-mono text-lg">
+                        {(training.progress?.epochs.at(-1)?.accuracy ?? 0).toFixed(3)}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
