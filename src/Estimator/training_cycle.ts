@@ -4,6 +4,7 @@ import { RunAsync } from "../Lib/run";
 import generateUUID from "../Lib/uuid";
 import LabelEncoder from "./label_encoder";
 import { shuffleArray } from "./rng_awful";
+import minMaxNormalizeTensor from "./tensor_min_max_normalize";
 import makeEstimator, { EstimatorVariant } from "./training/model_templates";
 
 export type DatasetX = [number, number, number, number, number];
@@ -36,7 +37,7 @@ export interface Progress {
 export function progressPercentage(progress: Progress) {
   if (progress.totalEpochs === 0) return 0;
 
-  return progress.epochs.length / progress.totalEpochs;
+  return (progress.epochs.length - 1) / progress.totalEpochs;
 }
 
 export default class TrainingCycle implements ImperativeObject {
@@ -47,8 +48,8 @@ export default class TrainingCycle implements ImperativeObject {
   public progress: Progress | null;
 
   constructor(variant: EstimatorVariant, numClasses: number) {
-    this.numClasses = 7;
-    this.estimator = makeEstimator(variant, 7);
+    this.numClasses = 3;
+    this.estimator = makeEstimator(variant, 3);
     this.progress = null;
   }
 
@@ -64,14 +65,15 @@ export default class TrainingCycle implements ImperativeObject {
     const X_values = dataset.map(X);
     const y_values_encoded = dataset.map(y).map((str) => le.encodeStringToInt(str));
 
-    const tX = tf.tensor2d(X_values);
+    const tX = minMaxNormalizeTensor(tf.tensor2d(X_values));
     const tY = tf.oneHot(tf.tensor1d(y_values_encoded, "int32"), this.numClasses);
 
     const totalEpochs = 50;
 
-    RunAsync(async (defer) => {
+    RunAsync(async (_defer) => {
       await this.estimator.fit(tX, tY, {
         epochs: totalEpochs,
+        shuffle: false,
         validationSplit: 0.2,
         batchSize: 32,
         callbacks: {
@@ -98,7 +100,6 @@ export default class TrainingCycle implements ImperativeObject {
 
             if (this.progress) {
               const previous = this.progress.epochs.at(-1) ?? null;
-              console.log({ previous });
               this.progress.epochs.push({
                 accuracy: previous?.accuracy ?? 0,
                 loss: previous?.loss ?? 1,
@@ -110,10 +111,7 @@ export default class TrainingCycle implements ImperativeObject {
             notifyUpdate(this);
           },
           onEpochEnd: async (epoch, logs) => {
-            console.log(
-              `✅ Finished epoch ${epoch + 1} - loss: ${logs?.loss?.toFixed(4)}, val_loss: ${logs?.val_loss?.toFixed(4)}`,
-              logs
-            );
+            console.log(`✅ Finished epoch ${epoch + 1}`, logs);
 
             // condição de early-stopping
             if (logs?.val_loss !== undefined && logs.val_loss < 0.05) {
@@ -149,27 +147,11 @@ export default class TrainingCycle implements ImperativeObject {
       console.log("Finished training async callback.");
     });
 
-    /*const { train, test } = trainTestSplit(shuffleArray(datasetEncoded, 1000), 0.1);
-
-    this.progress = {
-      state: "StillTraining",
-      dataset: { train, test },
-      totalEpochs: estimateEpochs(
-        0.1,
-        this.estimator.countParams(),
-        train.length,
-        X(dataset[0]).length,
-        categoryEncoder.categoryCount
-      ),
-      epochs: [],
-    };*/
-
-    //this.estimator.fit(tX, tY, {
-    //  epochs:
-    //});
-
     notifyUpdate(this);
   }
 
-  stop() {}
+  stop() {
+    this.estimator.stopTraining = true;
+    notifyUpdate(this);
+  }
 }

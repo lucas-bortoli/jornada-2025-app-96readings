@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import useAlert from "../../Components/AlertDialog";
 import { useToast } from "../../Components/Toast";
+import { loadSampleDataset } from "../../Estimator";
 import { EstimatorVariant } from "../../Estimator/training/model_templates";
 import TrainingCycle, { progressPercentage } from "../../Estimator/training_cycle";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
@@ -10,7 +11,6 @@ import Run, { RunAsync } from "../../Lib/run";
 import useAbortSignal from "../../Lib/use_abort_signal";
 import useKeepAwake from "../../Lib/use_keep_awake";
 import TimeProgress from "./components/time_progress";
-import { dataset } from "../../Estimator";
 
 interface TrainingProps {
   variant: EstimatorVariant;
@@ -36,7 +36,7 @@ export default function Training(props: TrainingProps) {
         duration: "long",
       });
 
-      await delay(500);
+      const [dataset] = await Promise.all([loadSampleDataset(), delay(500)]);
 
       if (pageAbortSignal.aborted) return;
       training.startTraining(dataset);

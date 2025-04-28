@@ -4,24 +4,32 @@ import { shuffleArray } from "./rng_awful";
 import datasetUrl from "./sample_data.tsv?url";
 import trainTestSplit from "./train_test_split";
 
-export const dataset = (await (await fetch(datasetUrl)).text())
-  .split("\n")
-  .slice(1)
-  .map(
-    (line) =>
-      line.split("\t").map((cell, idx) => (idx === 5 ? cell : parseInt(cell))) as [
-        number,
-        number,
-        number,
-        number,
-        number,
-        string,
-      ]
-  );
+export async function loadSampleDataset() {
+  const classWhitelist = new Set(["coffee", "tea", "air"]);
 
-console.log(dataset);
-//@ts-expect-error
-window.dataset = dataset;
+  const dataset = (await (await fetch(datasetUrl)).text())
+    .split("\n")
+    .slice(1)
+    .filter((l) => l.split("\t").length === 6)
+    .map(
+      (line) =>
+        line.split("\t").map((cell, idx) => (idx === 5 ? cell : parseInt(cell))) as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          string,
+        ]
+    )
+    .filter((row) => classWhitelist.has(row[5]));
+
+  //@ts-expect-error
+  window.dataset = dataset;
+
+  return dataset;
+}
+
 //@ts-expect-error
 window.LabelEncoder = LabelEncoder;
 //@ts-expect-error
