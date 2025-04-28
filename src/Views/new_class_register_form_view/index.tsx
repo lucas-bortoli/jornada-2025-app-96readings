@@ -33,7 +33,7 @@ export default function NewClassRegisterView() {
   });
 
   return (
-    <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll font-serif">
+    <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll pb-8 font-serif">
       <nav className="border-grey-800 bg-grey-100 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b p-4">
         <h1 className="text-xl">{currentWindow?.title}</h1>
       </nav>
