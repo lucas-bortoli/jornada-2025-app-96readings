@@ -1,6 +1,7 @@
 import { motion, Variant } from "framer-motion";
 import VirtualBackButton from "../../Components/VirtualBackButton";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import useKeepAwake from "../../Lib/use_keep_awake";
 import ScanAnimationGraphic from "./components/scan_animation_graphic";
 
 const variants = {
@@ -33,6 +34,8 @@ export default function Connection(props: ConnectionProps) {
   useProvideCurrentWindow({
     backButtonHandler: (exit) => exit(),
   });
+
+  useKeepAwake();
 
   return (
     <div className="h-full w-full bg-white/20 backdrop-blur-sm">

@@ -8,6 +8,7 @@ import delay from "../../Lib/delay";
 import useImperativeObject from "../../Lib/imperative_object";
 import Run, { RunAsync } from "../../Lib/run";
 import useAbortSignal from "../../Lib/use_abort_signal";
+import useKeepAwake from "../../Lib/use_keep_awake";
 import TimeProgress from "./components/time_progress";
 import { dataset } from "../../Estimator";
 
@@ -21,8 +22,9 @@ export default function Training(props: TrainingProps) {
   const showToast = useToast();
 
   const training = useImperativeObject(() => new TrainingCycle(props.variant, props.numClasses));
-
   const pageAbortSignal = useAbortSignal();
+
+  useKeepAwake();
 
   useEffect(() => {
     RunAsync(async () => {
