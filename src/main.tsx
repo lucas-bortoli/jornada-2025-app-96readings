@@ -7,17 +7,20 @@ import { WindowManagerProvider, WindowsOutlet } from "./Lib/compass_navigator";
 import { MiniGBusProvider } from "./Lib/gbus_mini";
 
 import "./Estimator/index";
+import { BluetoothProvider } from "./Lib/bluetooth";
 
 createRoot(document.getElementById("root")!).render(
   <MiniGBusProvider>
-    <BackButtonProvider>
-      <ToastProvider>
-        <WindowManagerProvider>
-          <App />
-          <WindowsOutlet />
-          <ToastsOutlet />
-        </WindowManagerProvider>
-      </ToastProvider>
-    </BackButtonProvider>
+    <BluetoothProvider>
+      <BackButtonProvider>
+        <ToastProvider>
+          <WindowManagerProvider>
+            <App />
+            <WindowsOutlet />
+            <ToastsOutlet />
+          </WindowManagerProvider>
+        </ToastProvider>
+      </BackButtonProvider>
+    </BluetoothProvider>
   </MiniGBusProvider>
 );

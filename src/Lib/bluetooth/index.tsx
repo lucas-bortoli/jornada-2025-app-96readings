@@ -1,31 +1,20 @@
-import { BleClient } from "@capacitor-community/bluetooth-le";
-import { ImperativeObject } from "../imperative_object";
-import generateUUID from "../uuid";
+import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import useObjectSubscription from "../imperative_object";
+import BluetoothOps from "./connection";
 
-const SERVICE_UUID = "df2f1391-514a-4ec9-9750-e47859e49d88";
-const CHARACTERISTIC_UUID = "fcf4d9d0-5c0c-43f6-bb2c-f19c5177ce7e";
+const context = createContext<null | BluetoothOps>(null);
 
-class BluetoothOps implements ImperativeObject {
-  public uuid: string = generateUUID();
-  public state: "Connected" | "TryingToConnect" = "TryingToConnect";
+export function BluetoothProvider(props: PropsWithChildren) {
+  const bluetooth = useMemo(() => new BluetoothOps(), []);
 
-  public async setupConnection() {
-    await BleClient.initialize({
-      androidNeverForLocation: true,
-    });
+  //@ts-expect-error
+  window.bluetooth = bluetooth;
 
-    const device = await BleClient.requestDevice({
-      services: [SERVICE_UUID],
-    });
-
-    console.log("Got device:", device);
-  }
-
-  public onUnmount() {}
+  return <context.Provider value={bluetooth}>{props.children}</context.Provider>;
 }
 
-//@ts-expect-error
-window.BluetoothOps = BluetoothOps;
+export default function useBluetoothConnection() {
+  const bluetooth = useObjectSubscription(useContext(context)!);
 
-//@ts-expect-error
-window.BleClient = BleClient;
+  return bluetooth;
+}

@@ -40,7 +40,7 @@ export default function Connection(props: ConnectionProps) {
   return (
     <div className="h-full w-full bg-white/20 backdrop-blur-sm">
       <motion.div
-        className="shadow-pixel-sm border-grey-800 fixed top-1/2 left-1/2 flex h-2/3 w-[calc(100%-theme('spacing.8'))] -translate-x-1/2 -translate-y-1/2 flex-col border bg-white p-4 font-serif"
+        className="shadow-pixel-sm border-grey-800 fixed top-1/2 left-1/2 flex h-2/3 w-[calc(100%-theme('spacing.8'))] max-w-96 -translate-x-1/2 -translate-y-1/2 flex-col border bg-white p-4 font-serif"
         initial="enter"
         animate="active"
         exit="exit"

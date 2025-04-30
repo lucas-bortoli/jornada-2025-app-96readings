@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { gbus, useMiniGBus } from "./gbus_mini";
 
 export type ObjectUUID = string & { _tag?: "objectUUID" };
@@ -10,37 +10,35 @@ export type ObjectUUID = string & { _tag?: "objectUUID" };
 export interface ImperativeObject {
   /** Unique identifier for the imperative object */
   uuid: ObjectUUID;
+
   /** Optional cleanup function executed when the object is unmounted */
   onUnmount?: () => void;
 }
 
 /**
- * Creates an imperative object that can trigger re-renders when externally mutated.
+ * Listens to an imperative object that can trigger re-renders when internally mutated.
  *
  * This hook:
- * - Instantiates the object using the provided factory function.
- * - Subscribes to external mutation events to force React re-renders.
+ * - Subscribes to internal mutation events to force React re-renders.
  * - Cleans up subscriptions on unmount.
  *
- * @param factory - Factory function that creates the imperative object
- * @returns - The instantiated imperative object
+ * @param object -The imperative object that will be listened for changes
+ * @returns - The same imperative object (pass-through)
  */
-export default function useImperativeObject<O extends ImperativeObject>(factory: () => O): O {
-  const object = useMemo(factory, []);
+export default function useObjectSubscription<O extends ImperativeObject>(object: O): O {
   const gbus = useMiniGBus();
   const [, forceUpdate] = useState(false);
 
   useEffect(() => {
     const eventKey = gbus.subscribe("imperativeUpdate", (payload) => {
       if (payload.objectUUID === object.uuid) {
-        // force a re-render when this object is updated externally
+        // force a re-render when this object is updated internally
         forceUpdate((prev) => !prev);
       }
     });
 
     return () => {
       gbus.unsubscribe(eventKey);
-      object.onUnmount?.();
     };
   }, [object]);
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import useAlert from "../../Components/AlertDialog";
 import { useToast } from "../../Components/Toast";
 import { loadSampleDataset } from "../../Estimator";
@@ -6,7 +6,7 @@ import { EstimatorVariant } from "../../Estimator/training/model_templates";
 import TrainingCycle, { progressPercentage } from "../../Estimator/training_cycle";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 import delay from "../../Lib/delay";
-import useImperativeObject from "../../Lib/imperative_object";
+import useObjectSubscription from "../../Lib/imperative_object";
 import Run, { RunAsync } from "../../Lib/run";
 import useAbortSignal from "../../Lib/use_abort_signal";
 import useKeepAwake from "../../Lib/use_keep_awake";
@@ -21,7 +21,9 @@ export default function Training(props: TrainingProps) {
   const showAlert = useAlert();
   const showToast = useToast();
 
-  const training = useImperativeObject(() => new TrainingCycle(props.variant, props.numClasses));
+  const training = useObjectSubscription(
+    useMemo(() => new TrainingCycle(props.variant, props.numClasses), [])
+  );
   const pageAbortSignal = useAbortSignal();
 
   useKeepAwake();

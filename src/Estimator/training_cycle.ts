@@ -68,7 +68,7 @@ export default class TrainingCycle implements ImperativeObject {
     const tX = minMaxNormalizeTensor(tf.tensor2d(X_values));
     const tY = tf.oneHot(tf.tensor1d(y_values_encoded, "int32"), this.numClasses);
 
-    const totalEpochs = 50;
+    const totalEpochs = 250;
 
     RunAsync(async (_defer) => {
       await this.estimator.fit(tX, tY, {
