@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useRef } from "react";
 
 /**
  * A strongly typed event bus with pub/sub and RPC capabilities.
@@ -71,6 +71,7 @@ class MiniGBus<
 type Events = {
   imperativeUpdate: { objectUUID: string };
   backButton: null;
+  bluetoothSensorData: [number, number, number, number, number];
 };
 type Procedures = {};
 
@@ -84,4 +85,21 @@ export function MiniGBusProvider(props: PropsWithChildren) {
 
 export function useMiniGBus() {
   return useContext(reactContext)!;
+}
+
+export function useMiniGBusSubscription<K extends keyof Events>(
+  topic: K,
+  callback: (value: Events[K]) => void
+) {
+  const gbus = useMiniGBus();
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+
+  useEffect(() => {
+    const subscription = gbus.subscribe(topic, (value) => {
+      callbackRef.current(value);
+    });
+
+    return () => gbus.unsubscribe(subscription);
+  }, [topic, gbus]);
 }

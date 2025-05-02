@@ -1,5 +1,7 @@
 import { BleClient, BleDevice, ScanResult } from "@capacitor-community/bluetooth-le";
 import { Capacitor } from "@capacitor/core";
+import PacketDecoder from "../binary/packet_decoder";
+import { gbus } from "../gbus_mini";
 import { ImperativeObject, notifyUpdate } from "../imperative_object";
 import generateUUID from "../uuid";
 
@@ -7,9 +9,9 @@ import generateUUID from "../uuid";
  * A class for handling Bluetooth LE (Low Energy) operations, such as connecting to a device, sending control commands,
  * and receiving status updates.
  */
-const SERVICE_UUID = "686ae9e3-0b45-485c-90bb-9442f3571af7";
-const CONTROL_CHARACTERISTIC_UUID = "e750171f-7796-4d77-bdfb-5b16dff6dc59";
-const STATUS_CHARACTERISTIC_UUID = "13e827f5-ecde-4927-b5f4-fd3f27ac89ee";
+const SERVICE_UUID = "686ae9e3-0b45-485c-90bb-9442f3571af8";
+const CONTROL_CHARACTERISTIC_UUID = "e750171f-7796-4d77-bdfb-5b16dff6dc58";
+const STATUS_CHARACTERISTIC_UUID = "13e827f5-ecde-4927-b5f4-fd3f27ac89e8";
 
 enum ControlAction {
   Increase = 0,
@@ -35,19 +37,9 @@ export default class BluetoothOps implements ImperativeObject {
   public state: "NotConnected" | "Connecting" | "Connected" = "NotConnected";
 
   /**
-   * The current PWM value (0–255) reported by the device.
-   */
-  public pwm: number = 0;
-
-  /**
    * The device ID of the connected BLE device.
    */
   private deviceId: string | null = null;
-
-  /**
-   * Callback for status updates from the device.
-   */
-  private onStatusUpdateCallback: ((value: number) => void) | null = null;
 
   /**
    * Callback for handling errors during Bluetooth operations.
@@ -193,11 +185,7 @@ export default class BluetoothOps implements ImperativeObject {
         SERVICE_UUID,
         STATUS_CHARACTERISTIC_UUID,
         (value) => {
-          const status = value.getUint8(0);
-          console.log("Status update received:", status);
-          this.pwm = status;
-          notifyUpdate(this);
-          this.onStatusUpdateCallback?.(status);
+          this.onPacketReceived(value.buffer);
         }
       );
     } catch (error) {
@@ -241,80 +229,20 @@ export default class BluetoothOps implements ImperativeObject {
   }
 
   /**
-   * Increases the PWM value by the specified delta.
-   * @param delta - The amount to increase the PWM (must be > 0).
-   * @throws If not connected or delta ≤ 0.
+   * A callback to handle status updates from the device.
+   * @param packet - The received packet from the device.
    */
-  public async increasePWM(delta: number): Promise<void> {
-    if (delta <= 0) {
-      throw new Error("Delta must be greater than 0.");
-    }
-    await this.sendControlCommand(ControlAction.Increase, delta);
-  }
+  private onPacketReceived(packet: ArrayBuffer): void {
+    const decoder = new PacketDecoder(new Uint8Array(packet));
 
-  /**
-   * Decreases the PWM value by the specified delta.
-   * @param delta - The amount to decrease the PWM (must be > 0).
-   * @throws If not connected or delta ≤ 0.
-   */
-  public async decreasePWM(delta: number): Promise<void> {
-    if (delta <= 0) {
-      throw new Error("Delta must be greater than 0.");
-    }
-    await this.sendControlCommand(ControlAction.Decrease, delta);
-  }
+    const value1 = decoder.readUInt16();
+    const value2 = decoder.readUInt16();
+    const value3 = decoder.readUInt16();
+    const value4 = decoder.readUInt16();
+    const value5 = decoder.readUInt16();
 
-  /**
-   * Sets the PWM value directly.
-   * @param value - The PWM value (0–255).
-   * @throws If not connected or value is out of range.
-   */
-  public async setPWM(value: number): Promise<void> {
-    if (value < 0 || value > 255) {
-      throw new Error("PWM value must be between 0 and 255.");
-    }
-    await this.sendControlCommand(ControlAction.SetPWM, value);
-  }
-
-  /**
-   * Stops the motor by sending a stop command.
-   * @throws If not connected.
-   */
-  public async stopMotor(): Promise<void> {
-    await this.sendControlCommand(ControlAction.Stop, 0);
-  }
-
-  /**
-   * Retrieves the current PWM value from the device.
-   * @returns The current PWM value (0–255).
-   * @throws If not connected or read fails.
-   */
-  public async getCurrentPWM(): Promise<number> {
-    if (this.state !== "Connected") {
-      throw new Error("Cannot get PWM: not connected.");
-    }
-
-    try {
-      const result = await BleClient.read(
-        this.deviceId!,
-        SERVICE_UUID,
-        STATUS_CHARACTERISTIC_UUID,
-        { timeout: 5000 }
-      );
-      return result.getUint8(0);
-    } catch (error) {
-      console.error("Failed to read current PWM:", error);
-      this.onErrorCallback?.(error as Error);
-      throw error;
-    }
-  }
-
-  /**
-   * Registers a callback to handle status updates from the device.
-   * @param callback - A function that receives the current PWM value.
-   */
-  public onStatusUpdate(callback: (value: number) => void): void {
-    this.onStatusUpdateCallback = callback;
+    gbus.publish("bluetoothSensorData", [value1, value2, value3, value4, value5]);
+    notifyUpdate(this);
   }
 
   /**
