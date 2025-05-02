@@ -341,6 +341,7 @@ export default class BluetoothOps implements ImperativeObject {
     console.log(`Device ${deviceId} disconnected`);
     this.state = "NotConnected";
     this.onErrorCallback?.(new Error(`Device ${deviceId} disconnected`));
+    notifyUpdate(this);
   }
 
   /**
