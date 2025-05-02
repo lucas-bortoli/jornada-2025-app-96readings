@@ -12,7 +12,7 @@ import Run from "../../Lib/run";
 import doSwitch from "../../Lib/switch_expression";
 import { useStateSet } from "../../Lib/use_map_set";
 import useUpdateEffect from "../../Lib/use_update_effect";
-import { NewClassRegisterWindow } from "../new_class_register_form_view";
+import { NewClassRegisterWindow } from "../new_class_register_form_view/_windows";
 import { TrainingWindow } from "./windows";
 
 export default function NewEstimatorPage() {
