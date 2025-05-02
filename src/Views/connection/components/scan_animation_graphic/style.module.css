@@ -1,6 +1,7 @@
 .visual2 {
   aspect-ratio: 1 / 1;
   position: relative;
+  border-radius: 50%;
 }
 
 .visual2:before,
@@ -11,14 +12,18 @@
   border: 4px solid #424242;
   border-radius: 50%;
   position: absolute;
-  animation: spin 1s infinite linear;
 }
 
-.visual2:before {
+/*----------------------------------------*/
+
+.visual2.connecting {
+}
+
+.visual2.connecting:before {
   animation: spin 2s infinite linear;
 }
-.visual2:after {
-  animation: spin 4s infinite linear alternate;
+.visual2.connecting:after {
+  animation: spin 3s infinite linear alternate;
 }
 
 @keyframes spin {
@@ -27,5 +32,35 @@
   }
   100% {
     transform: rotate3d(360deg);
+  }
+}
+
+/*----------------------------------------*/
+
+.visual2.connected {
+}
+
+.visual2.connected::before,
+.visual2.connected::after {
+  border: 4px solid #ffffff; /* White border for contrast */
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.visual2.connected::before {
+  animation: pulse 3s infinite ease-in-out;
+}
+
+.visual2.connected::after {
+  animation: pulse 4s infinite ease-in-out;
+  border-color: #2e7d32; /* Darker green for depth */
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
   }
 }
