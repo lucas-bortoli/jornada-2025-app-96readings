@@ -1,4 +1,6 @@
-export default function generateUUID(): string {
+export type UUID = string & { _tag?: "uuid" };
+
+export default function generateUUID(): UUID {
   // Check if crypto.randomUUID is available (Node.js 15+, modern browsers)
   if (typeof crypto === "object" && "randomUUID" in crypto) {
     return crypto.randomUUID();

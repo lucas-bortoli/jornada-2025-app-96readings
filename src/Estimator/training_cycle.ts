@@ -48,8 +48,8 @@ export default class TrainingCycle implements ImperativeObject {
   public progress: Progress | null;
 
   constructor(variant: EstimatorVariant, numClasses: number) {
-    this.numClasses = 3;
-    this.estimator = makeEstimator(variant, 3);
+    this.numClasses = numClasses;
+    this.estimator = makeEstimator(variant, numClasses);
     this.progress = null;
   }
 
