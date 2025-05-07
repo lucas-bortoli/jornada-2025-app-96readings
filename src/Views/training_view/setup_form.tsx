@@ -14,11 +14,15 @@ import { useStateSet } from "../../Lib/use_map_set";
 import useUpdateEffect from "../../Lib/use_update_effect";
 import { NewClassRegisterWindow } from "../new_class_register_form_view/_windows";
 import { TrainingWindow } from "./windows";
+import { useStorageQuery } from "../../Storage/use_storage";
+import { CategoryID, getAllCategories } from "../../Storage";
 
 export default function NewEstimatorPage() {
   const showToast = useToast();
   const windowing = useWindowing();
-  const [selectedClasses, mutateSelectedClasses] = useStateSet<number>(() => new Set([1]));
+  const [selectedClasses, mutateSelectedClasses] = useStateSet<CategoryID>(() => new Set([]));
+
+  const storageCategories = useStorageQuery(getAllCategories, []);
 
   useProvideCurrentWindow({
     title: ["Novo Estimador", `${selectedClasses} classes selecionadas`].join(" - "),
@@ -28,9 +32,9 @@ export default function NewEstimatorPage() {
     windowing.createWindow(NewClassRegisterWindow, {});
   }
 
-  function toggleTrainingClass(card: number) {
-    mutateSelectedClasses.toggle(card);
-    if (selectedClasses.has(card)) {
+  function toggleTrainingClass(categoryId: CategoryID) {
+    mutateSelectedClasses.toggle(categoryId);
+    if (selectedClasses.has(categoryId)) {
       showToast({
         content: "A classe será incluída no treinamento.",
         duration: "shortest",
@@ -87,17 +91,18 @@ export default function NewEstimatorPage() {
             <h3 className="text-lg leading-4 font-semibold">Nova classe</h3>
             <span className="text-sm leading-4">Coletar amostras</span>
           </motion.li>
-          {[0, 1, 2, 3].map((card) => (
+          {(storageCategories ?? []).map((category) => (
             <motion.li
-              key={card}
+              key={category.id}
               className={cn(
                 "border-grey-800 flex aspect-[3/4] h-full shrink-0 flex-col justify-end overflow-hidden border p-2",
-                !selectedClasses.has(card) && "shadow-pixel-sm bg-white",
-                selectedClasses.has(card) && "bg-grey-100 translate-x-px translate-y-px shadow-none"
+                !selectedClasses.has(category.id) && "shadow-pixel-sm bg-white",
+                selectedClasses.has(category.id) &&
+                  "bg-grey-100 translate-x-px translate-y-px shadow-none"
               )}
-              onClick={toggleTrainingClass.bind(null, card)}>
-              <h3 className="text-lg leading-4 font-semibold">Classe</h3>
-              <span className="text-sm leading-4">3 amostras</span>
+              onClick={toggleTrainingClass.bind(null, category.id)}>
+              <h3 className="text-lg leading-4 font-semibold">{category.friendly_name}</h3>
+              <span className="text-sm leading-4">{category.datapoints.length} amostras</span>
             </motion.li>
           ))}
         </ul>

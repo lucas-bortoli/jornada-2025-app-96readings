@@ -9,6 +9,11 @@ import { MiniGBusProvider } from "./Lib/gbus_mini";
 import "./Estimator/index";
 import { BluetoothProvider } from "./Lib/bluetooth";
 
+import * as storage from "./Storage";
+
+//@ts-expect-error
+window.storage = storage;
+
 createRoot(document.getElementById("root")!).render(
   <MiniGBusProvider>
     <BluetoothProvider>
