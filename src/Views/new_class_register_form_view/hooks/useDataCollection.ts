@@ -1,11 +1,11 @@
 import { useReducer, useRef, useState } from "react";
 import { useMiniGBusSubscription } from "../../../Lib/gbus_mini";
 
-type SensorData = [number, number, number, number, number];
+type SensorDataRow = Uint16Array;
 
 export default function useDataCollection() {
   const [, refresh] = useReducer(() => ({}), {});
-  const stagingDataRef = useRef<SensorData[]>([]);
+  const stagingDataRef = useRef<SensorDataRow[]>([]);
   const [isCollecting, setCollecting] = useState(false);
 
   useMiniGBusSubscription("bluetoothSensorData", (data) => {
@@ -27,7 +27,7 @@ export default function useDataCollection() {
   }
 
   return {
-    stagingData: stagingDataRef.current as ReadonlyArray<SensorData>,
+    stagingData: stagingDataRef.current as ReadonlyArray<SensorDataRow>,
     isCollecting,
     setCollecting,
     commit,

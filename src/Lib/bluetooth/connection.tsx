@@ -241,7 +241,7 @@ export default class BluetoothOps implements ImperativeObject {
     const value4 = decoder.readUInt16();
     const value5 = decoder.readUInt16();
 
-    gbus.publish("bluetoothSensorData", [value1, value2, value3, value4, value5]);
+    gbus.publish("bluetoothSensorData", new Uint16Array([value1, value2, value3, value4, value5]));
     notifyUpdate(this);
   }
 
