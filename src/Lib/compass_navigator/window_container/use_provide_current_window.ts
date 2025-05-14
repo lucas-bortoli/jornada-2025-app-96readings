@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { BackButtonHandler, useWindowing } from "..";
+import { useEffect, useRef } from "react";
+import { BackButtonHandler, useWindowing, Window } from "..";
 import useCurrentRef from "../../use_current_ref";
 import useCurrentWindowKey from "./current_window_key_context";
 
@@ -8,7 +8,9 @@ export interface UseCurrentWindowOptions {
   backButtonHandler?: BackButtonHandler;
 }
 
-export default function useProvideCurrentWindow(options: UseCurrentWindowOptions) {
+export default function useProvideCurrentWindow<P = any>(
+  options: UseCurrentWindowOptions
+): Window<P> {
   const windowing = useWindowing();
   const currentWindowKey = useCurrentWindowKey();
   const backHandlerRef = useCurrentRef(options.backButtonHandler ?? null);
@@ -20,7 +22,14 @@ export default function useProvideCurrentWindow(options: UseCurrentWindowOptions
     });
   }, [options.title]);
 
-  const currentWindow = windowing.windows.find((w) => w.key === currentWindowKey);
+  // will never be null on the first render, only when leaving
+  const currentWindow = windowing.windows.find((w) => w.key === currentWindowKey) ?? null;
 
-  return currentWindow;
+  // when unmounting and during an animation, the returned `currentWindow` becomes null. This memorizes the most recent window reference.
+  const currentWindowNeverNullRef = useRef<Window<P> | null>(null);
+  if (currentWindow !== null) {
+    currentWindowNeverNullRef.current = currentWindow;
+  }
+
+  return currentWindowNeverNullRef.current!;
 }

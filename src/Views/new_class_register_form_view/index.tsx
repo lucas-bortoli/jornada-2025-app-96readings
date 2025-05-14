@@ -1,16 +1,17 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
 import { IconButton } from "../../Components/Button";
 import TextField from "../../Components/TextField";
 import { useToast } from "../../Components/Toast";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import generateFriendlyName from "../../Lib/friendly_name_generator";
 import useUpdateEffect from "../../Lib/use_update_effect";
-import InformationOrb from "./components/InformationOrb";
-import useDataCollection from "./hooks/useDataCollection";
-import { CategoryID } from "../../Storage";
 import generateUUID from "../../Lib/uuid";
 import * as storage from "../../Storage";
+import { CategoryID } from "../../Storage";
+import InformationOrb from "./components/InformationOrb";
+import useDataCollection from "./hooks/useDataCollection";
 
 interface NewClassRegisterViewProps {
   categoryId: CategoryID | null;
@@ -22,9 +23,28 @@ export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
 
   const categoryId = props.categoryId ?? useMemo(generateUUID, []);
 
-  const [className, setClassName] = useState("");
+  const [className, setClassName] = useState(generateFriendlyName());
 
   const dataCollection = useDataCollection();
+
+  const [storedDataLength, setStoredDataLength] = useState(0);
+  const reloadStoredData = useCallback(
+    async function () {
+      try {
+        const category = await storage.getCategory(categoryId);
+        const datapointCount = category.sessions.reduce((acc, s) => acc + s.datapoints.length, 0);
+        setClassName(category.friendly_name);
+        setStoredDataLength(datapointCount);
+      } catch (_) {
+        setStoredDataLength(0);
+      }
+    },
+    [categoryId]
+  );
+
+  useEffect(() => {
+    reloadStoredData();
+  }, []);
 
   const isHandlingBack = useRef(false);
   const currentWindow = useProvideCurrentWindow({
@@ -40,18 +60,8 @@ export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
         return;
       }
 
-      showAlert({
-        title: "Cancelar criação de classe?",
-        content: <p>Você perderá todos os dados coletados neste formulário!</p>,
-        buttons: { cancel: "Voltar", confirm: "Confirmar" },
-      })
-        .then((choice) => {
-          if (choice === "cancel") return;
-          killThisWindow();
-        })
-        .finally(() => {
-          isHandlingBack.current = false;
-        });
+      killThisWindow();
+      isHandlingBack.current = false;
     },
   });
 
@@ -91,7 +101,7 @@ export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
 
     if (props.categoryId === null) {
       // create class
-      storage.createCategory({
+      await storage.createCategory({
         id: categoryId,
         friendly_name: className,
         sessions: [
@@ -100,10 +110,12 @@ export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
           },
         ],
       });
+      await reloadStoredData();
+      dataCollection.discard();
     } else {
       // update class
       const previousCategory = await storage.getCategory(categoryId);
-      storage.updateCategory(categoryId, {
+      await storage.updateCategory(categoryId, {
         ...previousCategory,
         sessions: [
           ...previousCategory.sessions,
@@ -112,6 +124,7 @@ export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
           },
         ],
       });
+      await reloadStoredData();
       dataCollection.discard();
     }
   }
@@ -122,7 +135,7 @@ export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
         <h1 className="text-xl">{currentWindow?.title}</h1>
       </nav>
       <section className="mx-4 flex flex-col items-stretch">
-        <span>Qual será o nome dessa classe?</span>
+        <span>Qual é o nome dessa classe?</span>
         <TextField
           kind="text"
           value={className}
@@ -139,7 +152,12 @@ export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
               count={dataCollection.stagingData.length}
               isAnimated={dataCollection.isCollecting}
             />
-            <InformationOrb size="large" label="Dados salvos" count={1000} isAnimated={false} />
+            <InformationOrb
+              size="large"
+              label="Dados salvos"
+              count={storedDataLength}
+              isAnimated={false}
+            />
           </div>
           <div>
             <IconButton
