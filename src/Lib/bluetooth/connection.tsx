@@ -228,20 +228,19 @@ export default class BluetoothOps implements ImperativeObject {
     }
   }
 
+  private textDecoder = new TextDecoder();
+
   /**
    * A callback to handle status updates from the device.
    * @param packet - The received packet from the device.
    */
   private onPacketReceived(packet: ArrayBuffer): void {
-    const decoder = new PacketDecoder(new Uint8Array(packet));
+    const segments = this.textDecoder
+      .decode(packet)
+      .split("  ")
+      .map((t) => parseFloat(t));
 
-    const value1 = decoder.readUInt16();
-    const value2 = decoder.readUInt16();
-    const value3 = decoder.readUInt16();
-    const value4 = decoder.readUInt16();
-    const value5 = decoder.readUInt16();
-
-    gbus.publish("bluetoothSensorData", new Uint16Array([value1, value2, value3, value4, value5]));
+    gbus.publish("bluetoothSensorData", new Uint32Array(segments));
     notifyUpdate(this);
   }
 

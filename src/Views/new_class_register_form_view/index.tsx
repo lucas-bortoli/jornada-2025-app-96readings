@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import useAlert from "../../Components/AlertDialog";
 import AppFooter from "../../Components/AppFooter";
 import { IconButton } from "../../Components/Button";
@@ -8,10 +8,19 @@ import useProvideCurrentWindow from "../../Lib/compass_navigator/window_containe
 import useUpdateEffect from "../../Lib/use_update_effect";
 import InformationOrb from "./components/InformationOrb";
 import useDataCollection from "./hooks/useDataCollection";
+import { CategoryID } from "../../Storage";
+import generateUUID from "../../Lib/uuid";
+import * as storage from "../../Storage";
 
-export default function NewClassRegisterView() {
+interface NewClassRegisterViewProps {
+  categoryId: CategoryID | null;
+}
+
+export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
   const showAlert = useAlert();
   const showToast = useToast();
+
+  const categoryId = props.categoryId ?? useMemo(generateUUID, []);
 
   const [className, setClassName] = useState("");
 
@@ -76,6 +85,37 @@ export default function NewClassRegisterView() {
     if (choice === "confirm") dataCollection.discard();
   }
 
+  async function handleSaveButton() {
+    const sessionDatapoints =
+      dataCollection.stagingData as unknown as storage.CollectionSession["datapoints"];
+
+    if (props.categoryId === null) {
+      // create class
+      storage.createCategory({
+        id: categoryId,
+        friendly_name: className,
+        sessions: [
+          {
+            datapoints: sessionDatapoints,
+          },
+        ],
+      });
+    } else {
+      // update class
+      const previousCategory = await storage.getCategory(categoryId);
+      storage.updateCategory(categoryId, {
+        ...previousCategory,
+        sessions: [
+          ...previousCategory.sessions,
+          {
+            datapoints: sessionDatapoints,
+          },
+        ],
+      });
+      dataCollection.discard();
+    }
+  }
+
   return (
     <main className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll pb-8 font-serif">
       <nav className="border-grey-800 bg-grey-100 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b p-4">
@@ -116,6 +156,7 @@ export default function NewClassRegisterView() {
             />
             <IconButton
               iconName="Save16"
+              onClick={handleSaveButton}
               disabled={
                 dataCollection.isCollecting === true || dataCollection.stagingData.length === 0
               }

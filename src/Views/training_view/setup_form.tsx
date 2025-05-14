@@ -29,7 +29,7 @@ export default function NewEstimatorPage() {
   });
 
   function openCreateNewClassPage() {
-    windowing.createWindow(NewClassRegisterWindow, {});
+    windowing.createWindow(NewClassRegisterWindow, { categoryId: null });
   }
 
   function toggleTrainingClass(categoryId: CategoryID) {
@@ -102,7 +102,9 @@ export default function NewEstimatorPage() {
               )}
               onClick={toggleTrainingClass.bind(null, category.id)}>
               <h3 className="text-lg leading-4 font-semibold">{category.friendly_name}</h3>
-              <span className="text-sm leading-4">{category.datapoints.length} amostras</span>
+              <span className="text-sm leading-4">
+                {category.sessions.reduce((acc, c) => acc + c.datapoints.length, 0)} amostras
+              </span>
             </motion.li>
           ))}
         </ul>

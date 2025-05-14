@@ -4,12 +4,12 @@ import generateUUID, { UUID } from "../Lib/uuid";
 /**
  * Represents a datapoint with values across multiple cycles.
  */
-export interface Datapoint {
-  cycle_1: number;
-  cycle_2: number;
-  cycle_3: number;
-  cycle_4: number;
-  cycle_5: number;
+export type Datapoint = Uint32Array;
+
+export interface CollectionSession {
+  // startTimestamp: number;
+  // endTimestamp: number;
+  datapoints: Datapoint[];
 }
 
 export type CategoryID = UUID & { _tag2?: "categoryId" };
@@ -20,12 +20,12 @@ export type CategoryID = UUID & { _tag2?: "categoryId" };
 export interface Category {
   id: CategoryID;
   friendly_name: string;
-  datapoints: Datapoint[];
+  sessions: CollectionSession[];
 }
 
 type CategoryItem = Record<CategoryID, Category>;
 
-export type CategoryInsertableUpdatable = Category & { id: never };
+export type CategoryInsertableUpdatable = Category & { id?: CategoryID };
 
 /**
  * Metadata of a category, excluding its datapoints.
@@ -47,7 +47,7 @@ export interface Model {
 
 type ModelItem = Record<ModelID, Model>;
 
-export type ModelInsertableUpdatable = Model & { id: never };
+export type ModelInsertableUpdatable = Model & { id?: ModelID };
 
 /**
  * Updates a value in localforage using an update function.

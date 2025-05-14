@@ -71,7 +71,7 @@ class MiniGBus<
 type Events = {
   imperativeUpdate: { objectUUID: string };
   backButton: null;
-  bluetoothSensorData: Uint16Array;
+  bluetoothSensorData: Uint32Array;
 };
 type Procedures = {};
 
