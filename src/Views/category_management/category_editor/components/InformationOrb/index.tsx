@@ -1,4 +1,4 @@
-import { cn } from "../../../../Lib/class_names";
+import { cn } from "../../../../../Lib/class_names";
 import style from "./style.module.css";
 
 interface InformationOrbProps {

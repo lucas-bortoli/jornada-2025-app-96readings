@@ -12,7 +12,6 @@ import Run from "../../Lib/run";
 import doSwitch from "../../Lib/switch_expression";
 import { useStateSet } from "../../Lib/use_map_set";
 import useUpdateEffect from "../../Lib/use_update_effect";
-import { NewClassRegisterWindow } from "../new_class_register_form_view/_windows";
 import { TrainingWindow } from "./windows";
 import { useStorageQuery } from "../../Storage/use_storage";
 import { CategoryID, getAllCategories } from "../../Storage";
@@ -27,10 +26,6 @@ export default function NewEstimatorPage() {
   useProvideCurrentWindow({
     title: ["Novo Estimador", `${selectedClasses} classes selecionadas`].join(" - "),
   });
-
-  function openCreateNewClassPage() {
-    windowing.createWindow(NewClassRegisterWindow, { categoryId: null });
-  }
 
   function toggleTrainingClass(categoryId: CategoryID) {
     mutateSelectedClasses.toggle(categoryId);
@@ -81,16 +76,8 @@ export default function NewEstimatorPage() {
         <h1 className="text-xl">Treinamento</h1>
       </nav>
       <section>
-        <span className="mx-4">Minhas classes</span>
-        <ul className="flex h-40 w-full gap-2 overflow-x-scroll py-2 before:mr-2 after:ml-2">
-          <motion.li
-            key="new_class"
-            whileTap={{ scale: 1.05 }}
-            className="shadow-pixel-sm border-grey-800 flex aspect-[3/4] h-full shrink-0 flex-col justify-end overflow-hidden border bg-white p-2"
-            onClick={openCreateNewClassPage}>
-            <h3 className="text-lg leading-4 font-semibold">Nova classe</h3>
-            <span className="text-sm leading-4">Coletar amostras</span>
-          </motion.li>
+        <span className="mx-4">Minhas categorias</span>
+        <ul className="flex h-48 w-full gap-2 overflow-x-scroll pb-2 before:mr-2 after:ml-2">
           {(storageCategories ?? []).map((category) => (
             <motion.li
               key={category.id}

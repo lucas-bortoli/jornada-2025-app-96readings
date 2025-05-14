@@ -1,5 +1,5 @@
 import { useReducer, useRef, useState } from "react";
-import { useMiniGBusSubscription } from "../../../Lib/gbus_mini";
+import { useMiniGBusSubscription } from "../../../../Lib/gbus_mini";
 
 export default function useDataCollection() {
   const [, refresh] = useReducer(() => ({}), {});

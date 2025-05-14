@@ -1,5 +1,5 @@
 import AppFooter from "../../../Components/AppFooter";
-import Button from "../../../Components/Button";
+import Button, { IconButton } from "../../../Components/Button";
 import ComboBox from "../../../Components/ComboBox";
 import ComboBoxOption from "../../../Components/ComboBox/ComboBoxOption";
 import { cn } from "../../../Lib/class_names";
@@ -32,15 +32,17 @@ export default function InferenceSetup(props: {}) {
         <h2 className="my-2 text-sm">Informações sobre o estimador selecionado</h2>
         <ul className={cn("ml-5 list-disc", style.model_info_list)}>
           <li>
-            Complexidade <strong>Mini</strong>
+            Complexidade <strong>mini</strong>
           </li>
           <li>
-            Treinado com <strong>3 classes</strong>
+            Treinado com <strong>3 substâncias</strong>
           </li>
         </ul>
       </section>
       <section className="flex justify-end px-4">
-        <Button onClick={goToInference}>Iniciar classificação</Button>
+        <IconButton iconName="SensorReading16" onClick={goToInference}>
+          Iniciar classificação
+        </IconButton>
       </section>
       <AppFooter />
     </main>

@@ -33,7 +33,7 @@ export interface IconButtonProps extends ButtonProps {
 
 export function IconButton(props: IconButtonProps) {
   const sizeClass = doSwitch(props.buttonSize ?? "normal", {
-    normal: cn("!h-8 !gap-2", !props.children && "!w-8", props.children && "!px-2"),
+    normal: cn("!h-10 !gap-2", !props.children && "!w-8", props.children && "!px-3"),
     small: cn("!h-6 !gap-1", !props.children && "!w-6", props.children && "!px-1"),
   });
 

@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import useAlert from "../../Components/AlertDialog";
-import AppFooter from "../../Components/AppFooter";
-import { IconButton } from "../../Components/Button";
-import TextField from "../../Components/TextField";
-import { useToast } from "../../Components/Toast";
-import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
-import generateFriendlyName from "../../Lib/friendly_name_generator";
-import useUpdateEffect from "../../Lib/use_update_effect";
-import generateUUID from "../../Lib/uuid";
-import * as storage from "../../Storage";
-import { CategoryID } from "../../Storage";
+import useAlert from "../../../Components/AlertDialog";
+import AppFooter from "../../../Components/AppFooter";
+import { IconButton } from "../../../Components/Button";
+import TextField from "../../../Components/TextField";
+import { useToast } from "../../../Components/Toast";
+import useProvideCurrentWindow from "../../../Lib/compass_navigator/window_container/use_provide_current_window";
+import generateFriendlyName from "../../../Lib/friendly_name_generator";
+import useUpdateEffect from "../../../Lib/use_update_effect";
+import generateUUID from "../../../Lib/uuid";
+import * as storage from "../../../Storage";
+import { CategoryID } from "../../../Storage";
 import InformationOrb from "./components/InformationOrb";
 import useDataCollection from "./hooks/useDataCollection";
 
-interface NewClassRegisterViewProps {
+interface CategoryEditorProps {
   categoryId: CategoryID | null;
 }
 
-export default function NewClassRegisterView(props: NewClassRegisterViewProps) {
+export default function CategoryEditor(props: CategoryEditorProps) {
   const showAlert = useAlert();
   const showToast = useToast();
 

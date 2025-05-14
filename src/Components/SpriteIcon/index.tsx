@@ -13,6 +13,9 @@ import IconDelete16 from "./Delete16.png";
 import IconEdit16 from "./Edit16.png";
 import IconRename16 from "./Rename16.png";
 import IconSearch16 from "./Search16.png";
+import IconAddDirectory16 from "./AddDirectory16.png";
+import IconSensorReading16 from "./SensorReading16.png";
+import IconEgg512 from "./Egg512.png";
 
 const Icons = {
   SpinnerArrow16: [IconSpinnerArrow16, 16],
@@ -29,6 +32,9 @@ const Icons = {
   Edit16: [IconEdit16, 16],
   Rename16: [IconRename16, 16],
   Search16: [IconSearch16, 16],
+  AddDirectory16: [IconAddDirectory16, 16],
+  SensorReading16: [IconSensorReading16, 16],
+  Egg512: [IconEgg512, 512],
 } as const;
 
 export type IconName = keyof typeof Icons;

@@ -3,49 +3,89 @@ import { IconButton } from "../../Components/Button";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 import { useStorageQuery } from "../../Storage/use_storage";
 import * as storage from "../../Storage";
+import { cn } from "../../Lib/class_names";
+import { useWindowing } from "../../Lib/compass_navigator";
+import { CategoryEditorWindow } from "./_windows";
+import AppFooter from "../../Components/AppFooter";
 
 export default function CategoryList() {
-  const currentWindow = useProvideCurrentWindow({ title: "Lista de Categorias" });
+  const currentWindow = useProvideCurrentWindow({ title: "Lista de Categorias e Substâncias" });
   const categories = useStorageQuery(storage.getAllCategories, []) ?? [];
+  const windowing = useWindowing();
 
   const [expandedItemKey, setExpandedItemKey] = useState<storage.CategoryID | null>(null);
 
+  async function handleCreateButton() {
+    windowing.createWindow(CategoryEditorWindow, {
+      categoryId: null,
+    });
+  }
+
+  async function handleDeleteButton(category: storage.Category) {}
+
+  async function handleEditButton(category: storage.Category) {
+    windowing.createWindow(CategoryEditorWindow, {
+      categoryId: category.id,
+    });
+  }
+
   return (
     <main
-      className="bg-grey-100 relative flex h-full w-full flex-col gap-4 overflow-y-scroll pb-8 font-serif"
+      className="bg-grey-100 relative flex h-full w-full flex-col overflow-y-scroll pb-8 font-serif"
       onClick={setExpandedItemKey.bind(null, null)}>
       <nav className="border-grey-800 bg-grey-100 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b p-4">
         <h1 className="text-xl">{currentWindow.title}</h1>
       </nav>
-      <p className="mx-4">Todas as substâncias registradas estão aqui.</p>
-      <ul>
-        {categories.map((category) => {
+      <p className="mx-4 mt-4">Todas as substâncias registradas estão aqui.</p>
+      <div className="mx-4 mt-8 flex justify-end">
+        <IconButton iconName="AddDirectory16" onClick={handleCreateButton}>
+          Criar nova substância
+        </IconButton>
+      </div>
+      <ul className="mt-2">
+        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8 py-16 text-center text-sm italic">
+          Nenhuma substância registrada ainda.
+        </li>
+        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8" />
+        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-4" />
+        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-2" />
+        {/*categories.map((category) => {
           const datapointCount = category.sessions.reduce((acc, s) => acc + s.datapoints.length, 0);
           const sessionCount = category.sessions.length;
+          const isSelected = expandedItemKey === category.id;
 
           return (
             <li
               key={category.id}
-              className="bg-grey-0 border-grey-800 shadow-pixel mx-4 mb-2 flex flex-col border"
+              className={cn(
+                "bg-grey-0 border-grey-800 mx-4 mb-2 flex flex-col border",
+                isSelected && "shadow-pixel-sm",
+                !isSelected && "shadow-pixel"
+              )}
               onClick={(e) => {
                 e.stopPropagation();
                 setExpandedItemKey(category.id);
               }}>
               <div className="p-2">
                 <h2 className="grow text-xl">{category.friendly_name}</h2>
-                <p className="leading-4">{datapointCount.toString()} coletas de dados</p>
                 <p className="leading-4">{sessionCount.toString()} sessões de coleta</p>
+                <p className="leading-4">{datapointCount.toString()} coletas de dados</p>
               </div>
-              {expandedItemKey === category.id && (
+              {isSelected && (
                 <footer className="border-grey-800 bg-grey-200 flex justify-end gap-2 border-t p-2">
-                  <IconButton iconName="Delete16">Apagar</IconButton>
-                  <IconButton iconName="Edit16">Editar</IconButton>
+                  <IconButton iconName="Delete16" onClick={handleDeleteButton.bind(null, category)}>
+                    Apagar
+                  </IconButton>
+                  <IconButton iconName="Edit16" onClick={handleEditButton.bind(null, category)}>
+                    Editar
+                  </IconButton>
                 </footer>
               )}
             </li>
           );
-        })}
+        })*/}
       </ul>
+      <AppFooter />
     </main>
   );
 }
