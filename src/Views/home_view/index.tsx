@@ -1,6 +1,7 @@
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import { CategoryListWindow } from "../category_management/_windows";
 import { ConnectionWindow } from "../connection/_windows";
 import { InferenceSetupWindow } from "../inference/_windows";
 import { NewEstimatorPageWindow } from "../training_view/windows";
@@ -8,7 +9,7 @@ import { NewEstimatorPageWindow } from "../training_view/windows";
 export default function HomePage() {
   const windowing = useWindowing();
 
-  function openPage(page: "Connection" | "Training" | "Classification") {
+  function openPage(page: "Connection" | "Training" | "Classification" | "CategoryManagement") {
     switch (page) {
       case "Connection":
         windowing.createWindow(ConnectionWindow, {});
@@ -18,6 +19,9 @@ export default function HomePage() {
         break;
       case "Classification":
         windowing.createWindow(InferenceSetupWindow, {});
+        break;
+      case "CategoryManagement":
+        windowing.createWindow(CategoryListWindow, {});
         break;
     }
   }
@@ -30,6 +34,9 @@ export default function HomePage() {
       <section className="flex flex-col items-stretch gap-2 px-4">
         <Button className="p-24 text-2xl" onClick={openPage.bind(null, "Connection")}>
           Conexão
+        </Button>
+        <Button className="p-24 text-2xl" onClick={openPage.bind(null, "CategoryManagement")}>
+          Categorias e Substâncias
         </Button>
         <Button className="p-24 text-2xl" onClick={openPage.bind(null, "Training")}>
           Treinamento
