@@ -16,6 +16,8 @@ import IconSearch16 from "./Search16.png";
 import IconAddDirectory16 from "./AddDirectory16.png";
 import IconSensorReading16 from "./SensorReading16.png";
 import IconEgg512 from "./Egg512.png";
+import IconEgg256 from "./Egg256.png";
+import { CSSProperties } from "react";
 
 const Icons = {
   SpinnerArrow16: [IconSpinnerArrow16, 16],
@@ -35,6 +37,7 @@ const Icons = {
   AddDirectory16: [IconAddDirectory16, 16],
   SensorReading16: [IconSensorReading16, 16],
   Egg512: [IconEgg512, 512],
+  Egg256: [IconEgg256, 256],
 } as const;
 
 export type IconName = keyof typeof Icons;
@@ -42,6 +45,7 @@ export type IconName = keyof typeof Icons;
 interface SpriteIconProps {
   name: IconName;
   className?: string;
+  style?: CSSProperties;
 }
 
 export const getIconUrl = (icon: IconName) => Icons[icon][0];
@@ -58,6 +62,7 @@ export default function SpriteIcon(props: SpriteIconProps) {
         fontSize: `${icon[1]}px`,
         height: `${icon[1]}px`,
         imageRendering: "pixelated",
+        ...props.style,
       }}
     />
   );

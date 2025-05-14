@@ -1,6 +1,7 @@
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
+import { AboutWindow } from "../about/_windows";
 import { CategoryListWindow } from "../category_management/_windows";
 import { ConnectionWindow } from "../connection/_windows";
 import { InferenceSetupWindow } from "../inference/_windows";
@@ -9,7 +10,9 @@ import { NewEstimatorPageWindow } from "../training_view/windows";
 export default function HomePage() {
   const windowing = useWindowing();
 
-  function openPage(page: "Connection" | "Training" | "Classification" | "CategoryManagement") {
+  function openPage(
+    page: "Connection" | "Training" | "Classification" | "CategoryManagement" | "About"
+  ) {
     switch (page) {
       case "Connection":
         windowing.createWindow(ConnectionWindow, {});
@@ -22,6 +25,9 @@ export default function HomePage() {
         break;
       case "CategoryManagement":
         windowing.createWindow(CategoryListWindow, {});
+        break;
+      case "About":
+        windowing.createWindow(AboutWindow, {});
         break;
     }
   }
@@ -44,7 +50,9 @@ export default function HomePage() {
         <Button className="p-24 text-2xl" onClick={openPage.bind(null, "Classification")}>
           Classificação
         </Button>
-        <Button className="p-24 text-2xl">Sobre o Aplicativo</Button>
+        <Button className="p-24 text-2xl" onClick={openPage.bind(null, "About")}>
+          Sobre o Aplicativo
+        </Button>
       </section>
       <AppFooter />
     </main>
