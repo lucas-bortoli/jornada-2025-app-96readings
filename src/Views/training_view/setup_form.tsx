@@ -77,7 +77,7 @@ export default function NewEstimatorPage() {
         2: "medium",
         3: "large",
       }) satisfies EstimatorVariant,
-      numClasses: selectedClasses.size,
+      categories: [...selectedClasses].map((id) => storageCategories.find((c) => c.id === id)!),
     });
   }
 

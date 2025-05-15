@@ -2,6 +2,7 @@ import * as tf from "@tensorflow/tfjs";
 import { ImperativeObject, notifyUpdate } from "../Lib/imperative_object";
 import { RunAsync } from "../Lib/run";
 import generateUUID from "../Lib/uuid";
+import { Category } from "../Storage";
 import LabelEncoder from "./label_encoder";
 import { shuffleArray } from "./rng_awful";
 import minMaxNormalizeTensor from "./tensor_min_max_normalize";
@@ -43,19 +44,41 @@ export function progressPercentage(progress: Progress) {
 export default class TrainingCycle implements ImperativeObject {
   public readonly uuid: string = generateUUID();
   public readonly estimator: tf.Sequential;
-  public readonly numClasses: number;
+  public readonly categories: Category[];
 
   public progress: Progress | null;
 
-  constructor(variant: EstimatorVariant, numClasses: number) {
-    this.numClasses = numClasses;
-    this.estimator = makeEstimator(variant, numClasses);
+  constructor(variant: EstimatorVariant, categories: Category[]) {
+    // filter out categories with zero datapoints
+    categories = categories.filter((cat) => {
+      return cat.sessions.reduce((acc, s) => acc + s.datapoints.length, 0) >= 1;
+    });
+
+    this.categories = categories;
+    this.estimator = makeEstimator(variant, categories.length);
     this.progress = null;
   }
 
-  startTraining(dataset: DatasetRow[]) {
+  startTraining() {
     if (this.progress !== null) {
       throw new Error("Training is already in progress!");
+    }
+
+    let dataset: DatasetRow[] = [];
+
+    for (const category of this.categories) {
+      for (const session of category.sessions) {
+        for (const datapoint of session.datapoints) {
+          dataset.push([
+            datapoint[0],
+            datapoint[1],
+            datapoint[2],
+            datapoint[3],
+            datapoint[4],
+            category.id,
+          ]);
+        }
+      }
     }
 
     dataset = shuffleArray(dataset, 1234);
@@ -66,9 +89,9 @@ export default class TrainingCycle implements ImperativeObject {
     const y_values_encoded = dataset.map(y).map((str) => le.encodeStringToInt(str));
 
     const tX = minMaxNormalizeTensor(tf.tensor2d(X_values));
-    const tY = tf.oneHot(tf.tensor1d(y_values_encoded, "int32"), this.numClasses);
+    const tY = tf.oneHot(tf.tensor1d(y_values_encoded, "int32"), this.categories.length);
 
-    const totalEpochs = 250;
+    const totalEpochs = 10;
 
     RunAsync(async (_defer) => {
       await this.estimator.fit(tX, tY, {
@@ -114,10 +137,10 @@ export default class TrainingCycle implements ImperativeObject {
             console.log(`✅ Finished epoch ${epoch + 1}`, logs);
 
             // condição de early-stopping
-            if (logs?.val_loss !== undefined && logs.val_loss < 0.05) {
-              console.log("🛑 Validation loss is low. Stopping early.");
-              this.estimator.stopTraining = true;
-            }
+            //if (logs?.val_loss !== undefined && logs.val_loss < 0.05) {
+            //  console.log("🛑 Validation loss is low. Stopping early.");
+            //  this.estimator.stopTraining = true;
+            //}
 
             if (this.progress && logs) {
               const current = this.progress.epochs.at(-1)!;

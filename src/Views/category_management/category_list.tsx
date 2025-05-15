@@ -54,12 +54,16 @@ export default function CategoryList() {
         </IconButton>
       </div>
       <ul className="mt-2">
-        {/*<li className="border-grey-800 mx-4 mb-2 border border-dashed p-8 py-16 text-center text-sm italic">
-          Nenhuma substância registrada ainda.
-        </li>
-        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8" />
-        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-4" />
-        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-2" />*/}
+        {sorter.sorted.length === 0 && (
+          <>
+            <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8 py-16 text-center text-sm italic">
+              Nenhuma substância registrada ainda.
+            </li>
+            <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8" />
+            <li className="border-grey-800 mx-4 mb-2 border border-dashed p-4" />
+            <li className="border-grey-800 mx-4 mb-2 border border-dashed p-2" />
+          </>
+        )}
         {sorter.sorted.map((category) => {
           const datapointCount = category.sessions.reduce((acc, s) => acc + s.datapoints.length, 0);
           const sessionCount = category.sessions.length;

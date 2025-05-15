@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import useAlert from "../../Components/AlertDialog";
 import { useToast } from "../../Components/Toast";
-import { loadSampleDataset } from "../../Estimator";
 import { EstimatorVariant } from "../../Estimator/training/model_templates";
 import TrainingCycle, { progressPercentage } from "../../Estimator/training_cycle";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
@@ -10,11 +9,12 @@ import useObjectSubscription from "../../Lib/imperative_object";
 import Run, { RunAsync } from "../../Lib/run";
 import useAbortSignal from "../../Lib/use_abort_signal";
 import useKeepAwake from "../../Lib/use_keep_awake";
+import { Category } from "../../Storage";
 import TimeProgress from "./components/time_progress";
 
 interface TrainingProps {
   variant: EstimatorVariant;
-  numClasses: number;
+  categories: Category[];
 }
 
 export default function Training(props: TrainingProps) {
@@ -22,7 +22,7 @@ export default function Training(props: TrainingProps) {
   const showToast = useToast();
 
   const training = useObjectSubscription(
-    useMemo(() => new TrainingCycle(props.variant, props.numClasses), [])
+    useMemo(() => new TrainingCycle(props.variant, props.categories), [])
   );
   const pageAbortSignal = useAbortSignal();
 
@@ -38,10 +38,8 @@ export default function Training(props: TrainingProps) {
         duration: "long",
       });
 
-      const [dataset] = await Promise.all([loadSampleDataset(), delay(500)]);
-
       if (pageAbortSignal.aborted) return;
-      training.startTraining(dataset);
+      training.startTraining();
 
       while (true) {
         if (pageAbortSignal.aborted) break;
