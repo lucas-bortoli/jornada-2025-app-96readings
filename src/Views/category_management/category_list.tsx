@@ -4,6 +4,7 @@ import { IconButton } from "../../Components/Button";
 import { cn } from "../../Lib/class_names";
 import { useWindowing } from "../../Lib/compass_navigator";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import useSort from "../../Lib/use_sort";
 import * as storage from "../../Storage";
 import { useStorageQuery } from "../../Storage/use_storage";
 import { CategoryEditorWindow } from "./_windows";
@@ -14,6 +15,16 @@ export default function CategoryList() {
   const windowing = useWindowing();
 
   const [expandedItemKey, setExpandedItemKey] = useState<storage.CategoryID | null>(null);
+
+  const sorter = useSort({
+    subjects: categories,
+    map: {
+      byDatapointCount: (category) =>
+        category.sessions.reduce((acc, s) => acc + s.datapoints.length, 0),
+    },
+    initialMethod: "byDatapointCount",
+    initialReversed: false,
+  });
 
   async function handleCreateButton() {
     windowing.createWindow(CategoryEditorWindow, {
@@ -49,7 +60,7 @@ export default function CategoryList() {
         <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8" />
         <li className="border-grey-800 mx-4 mb-2 border border-dashed p-4" />
         <li className="border-grey-800 mx-4 mb-2 border border-dashed p-2" />*/}
-        {categories.map((category) => {
+        {sorter.sorted.map((category) => {
           const datapointCount = category.sessions.reduce((acc, s) => acc + s.datapoints.length, 0);
           const sessionCount = category.sessions.length;
           const isSelected = expandedItemKey === category.id;

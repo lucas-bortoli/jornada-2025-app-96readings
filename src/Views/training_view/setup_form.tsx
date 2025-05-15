@@ -11,17 +11,28 @@ import useProvideCurrentWindow from "../../Lib/compass_navigator/window_containe
 import Run from "../../Lib/run";
 import doSwitch from "../../Lib/switch_expression";
 import { useStateSet } from "../../Lib/use_map_set";
+import useSort from "../../Lib/use_sort";
 import useUpdateEffect from "../../Lib/use_update_effect";
-import { TrainingWindow } from "./windows";
-import { useStorageQuery } from "../../Storage/use_storage";
 import { CategoryID, getAllCategories } from "../../Storage";
+import { useStorageQuery } from "../../Storage/use_storage";
+import { TrainingWindow } from "./windows";
 
 export default function NewEstimatorPage() {
   const showToast = useToast();
   const windowing = useWindowing();
   const [selectedClasses, mutateSelectedClasses] = useStateSet<CategoryID>(() => new Set([]));
 
-  const storageCategories = useStorageQuery(getAllCategories, []);
+  const storageCategories = useStorageQuery(getAllCategories, []) ?? [];
+
+  const sorter = useSort({
+    subjects: storageCategories,
+    map: {
+      byDatapointCount: (category) =>
+        category.sessions.reduce((acc, s) => acc + s.datapoints.length, 0),
+    },
+    initialMethod: "byDatapointCount",
+    initialReversed: false,
+  });
 
   useProvideCurrentWindow({
     title: ["Novo Estimador", `${selectedClasses} classes selecionadas`].join(" - "),
@@ -78,7 +89,7 @@ export default function NewEstimatorPage() {
       <section>
         <span className="mx-4">Minhas categorias</span>
         <ul className="flex h-48 w-full gap-2 overflow-x-scroll pb-2 before:mr-2 after:ml-2">
-          {(storageCategories ?? []).map((category) => (
+          {sorter.sorted.map((category) => (
             <motion.li
               key={category.id}
               className={cn(
