@@ -1,12 +1,12 @@
 import { useState } from "react";
+import AppFooter from "../../Components/AppFooter";
 import { IconButton } from "../../Components/Button";
-import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
-import { useStorageQuery } from "../../Storage/use_storage";
-import * as storage from "../../Storage";
 import { cn } from "../../Lib/class_names";
 import { useWindowing } from "../../Lib/compass_navigator";
+import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import * as storage from "../../Storage";
+import { useStorageQuery } from "../../Storage/use_storage";
 import { CategoryEditorWindow } from "./_windows";
-import AppFooter from "../../Components/AppFooter";
 
 export default function CategoryList() {
   const currentWindow = useProvideCurrentWindow({ title: "Lista de Categorias e Substâncias" });
@@ -43,13 +43,13 @@ export default function CategoryList() {
         </IconButton>
       </div>
       <ul className="mt-2">
-        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8 py-16 text-center text-sm italic">
+        {/*<li className="border-grey-800 mx-4 mb-2 border border-dashed p-8 py-16 text-center text-sm italic">
           Nenhuma substância registrada ainda.
         </li>
         <li className="border-grey-800 mx-4 mb-2 border border-dashed p-8" />
         <li className="border-grey-800 mx-4 mb-2 border border-dashed p-4" />
-        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-2" />
-        {/*categories.map((category) => {
+        <li className="border-grey-800 mx-4 mb-2 border border-dashed p-2" />*/}
+        {categories.map((category) => {
           const datapointCount = category.sessions.reduce((acc, s) => acc + s.datapoints.length, 0);
           const sessionCount = category.sessions.length;
           const isSelected = expandedItemKey === category.id;
@@ -83,7 +83,7 @@ export default function CategoryList() {
               )}
             </li>
           );
-        })*/}
+        })}
       </ul>
       <AppFooter />
     </main>

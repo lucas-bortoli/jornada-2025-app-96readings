@@ -1,9 +1,9 @@
 import { ButtonHTMLAttributes, PropsWithChildren, Ref } from "react";
 import { cn } from "../../Lib/class_names";
-import style from "./style.module.css";
+import doSwitch from "../../Lib/switch_expression";
 import type { IconName } from "../SpriteIcon";
 import SpriteIcon from "../SpriteIcon";
-import doSwitch from "../../Lib/switch_expression";
+import style from "./style.module.css";
 
 export interface ButtonProps extends PropsWithChildren, ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -33,7 +33,7 @@ export interface IconButtonProps extends ButtonProps {
 
 export function IconButton(props: IconButtonProps) {
   const sizeClass = doSwitch(props.buttonSize ?? "normal", {
-    normal: cn("!h-10 !gap-2", !props.children && "!w-8", props.children && "!px-3"),
+    normal: cn("!h-10 !gap-2", !props.children && "!w-10", props.children && "!px-3"),
     small: cn("!h-6 !gap-1", !props.children && "!w-6", props.children && "!px-1"),
   });
 

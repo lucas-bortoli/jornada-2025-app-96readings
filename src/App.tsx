@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useWindowing } from "./Lib/compass_navigator";
-import { HomePageWindow } from "./Views/home_view";
 import { useMiniGBus } from "./Lib/gbus_mini";
+import { HomePageWindow } from "./Views/home_view";
 
 export default function App() {
   const windowing = useWindowing();
@@ -12,21 +12,21 @@ export default function App() {
     return () => windowing.removeWindow(key);
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const row = [
-        Math.random() * 80000,
-        Math.random() * 80000,
-        Math.random() * 80000,
-        Math.random() * 80000,
-        Math.random() * 80000,
-      ].map((i) => Math.floor(i * 100) / 100);
-
-      gbus.publish("bluetoothSensorData", new Uint32Array(row));
-    }, 500);
-
-    return () => clearInterval(timer);
-  }, []);
+  //useEffect(() => {
+  //  const timer = setInterval(() => {
+  //    const row = [
+  //      Math.random() * 80000,
+  //      Math.random() * 80000,
+  //      Math.random() * 80000,
+  //      Math.random() * 80000,
+  //      Math.random() * 80000,
+  //    ].map((i) => Math.floor(i * 100) / 100);
+  //
+  //    gbus.publish("bluetoothSensorData", new Uint32Array(row));
+  //  }, 500);
+  //
+  //  return () => clearInterval(timer);
+  //}, []);
 
   return null;
 }
