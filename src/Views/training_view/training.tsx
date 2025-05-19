@@ -2,17 +2,21 @@ import { useEffect, useMemo, useRef } from "react";
 import useAlert from "../../Components/AlertDialog";
 import { useToast } from "../../Components/Toast";
 import { EstimatorVariant } from "../../Estimator/training/model_templates";
-import TrainingCycle, { progressPercentage } from "../../Estimator/training_cycle";
+import TrainingCycle from "../../Estimator/training_cycle";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 import delay from "../../Lib/delay";
+import { useMiniGBusSubscription } from "../../Lib/gbus_mini";
 import useObjectSubscription from "../../Lib/imperative_object";
 import Run, { RunAsync } from "../../Lib/run";
 import useAbortSignal from "../../Lib/use_abort_signal";
 import useKeepAwake from "../../Lib/use_keep_awake";
+import * as storage from "../../Storage";
 import { Category } from "../../Storage";
+import Percentage from "./components/percentage";
 import TimeProgress from "./components/time_progress";
 
 interface TrainingProps {
+  friendlyName: string;
   variant: EstimatorVariant;
   categories: Category[];
 }
@@ -25,6 +29,9 @@ export default function Training(props: TrainingProps) {
     useMemo(() => new TrainingCycle(props.variant, props.categories), [])
   );
   const pageAbortSignal = useAbortSignal();
+
+  //@ts-expect-error
+  window.training = training;
 
   useKeepAwake();
 
@@ -55,10 +62,36 @@ export default function Training(props: TrainingProps) {
     };
   }, [training]);
 
+  useMiniGBusSubscription("trainingComplete", async (event) => {
+    if (event.objectUUID !== training.uuid) return;
+
+    // salvar estimador
+    await storage.createModel({
+      size_class: props.variant,
+      friendly_name: props.friendlyName,
+      categories: props.categories,
+      data: {
+        model: training.estimator.toJSON(null, false) as object,
+        scaler: training.scaler.toJSON(),
+        encoder: training.encoder.toJSON(),
+      },
+    });
+
+    showAlert({
+      title: "Treinamento concluído",
+      content: <p>O estimador foi treinado com sucesso.</p>,
+      buttons: { ok: "OK" },
+    });
+  });
+
   const isHandlingBackButton = useRef(false);
   useProvideCurrentWindow({
     backButtonHandler: async (killThisWindow) => {
       if (isHandlingBackButton.current) return;
+
+      if (training.progress?.state === "Complete") {
+        return killThisWindow();
+      }
 
       const userChoice = await showAlert({
         title: "Parar treinamento?",
@@ -88,9 +121,7 @@ export default function Training(props: TrainingProps) {
 
           return (
             <>
-              <h1 className="text-6xl">
-                {(progressPercentage(training.progress) * 100).toFixed(0)}%
-              </h1>
+              <Percentage progress={training.progress} className="text-6xl" />
               <p>
                 Época {training.progress.epochs.length} de {training.progress.totalEpochs}
               </p>

@@ -72,6 +72,7 @@ type Events = {
   imperativeUpdate: { objectUUID: string };
   backButton: null;
   bluetoothSensorData: Uint32Array;
+  trainingComplete: { objectUUID: string };
 };
 type Procedures = {};
 

@@ -2,12 +2,14 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
+import TextField from "../../Components/TextField";
 import { useToast } from "../../Components/Toast";
 import ToggleButton from "../../Components/ToggleButton";
 import { EstimatorVariant } from "../../Estimator/training/model_templates";
 import { cn } from "../../Lib/class_names";
 import { useWindowing } from "../../Lib/compass_navigator";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
+import generateFriendlyName from "../../Lib/friendly_name_generator";
 import Run from "../../Lib/run";
 import doSwitch from "../../Lib/switch_expression";
 import { useStateSet } from "../../Lib/use_map_set";
@@ -20,6 +22,7 @@ import { TrainingWindow } from "./windows";
 export default function NewEstimatorPage() {
   const showToast = useToast();
   const windowing = useWindowing();
+  const [modelName, setModelName] = useState(generateFriendlyName());
   const [selectedClasses, mutateSelectedClasses] = useStateSet<CategoryID>(() => new Set([]));
 
   const storageCategories = useStorageQuery(getAllCategories, []) ?? [];
@@ -71,6 +74,7 @@ export default function NewEstimatorPage() {
     }
 
     windowing.createWindow(TrainingWindow, {
+      friendlyName: modelName,
       variant: doSwitch(networkSize, {
         0: "mini",
         1: "small",
@@ -86,6 +90,15 @@ export default function NewEstimatorPage() {
       <nav className="border-grey-800 bg-grey-100 sticky top-0 z-10 mt-8 flex items-center gap-2 border-b p-4">
         <h1 className="text-xl">Treinamento</h1>
       </nav>
+      <section className="mx-4 flex flex-col items-stretch">
+        <span>Qual é o nome dessa classe?</span>
+        <TextField
+          kind="text"
+          value={modelName}
+          onInput={setModelName}
+          placeholder="Nome da classe..."
+        />
+      </section>
       <section>
         <span className="mx-4">Minhas categorias</span>
         <ul className="flex h-48 w-full gap-2 overflow-x-scroll pb-2 before:mr-2 after:ml-2">

@@ -1,4 +1,7 @@
 import localforage from "localforage";
+import { SerializedLabelEncoder } from "../Estimator/label_encoder";
+import { MinMaxScalerData } from "../Estimator/tensor_min_max_normalize";
+import { EstimatorVariant } from "../Estimator/training/model_templates";
 import generateUUID, { UUID } from "../Lib/uuid";
 
 /**
@@ -40,14 +43,19 @@ export type ModelID = UUID & { _tag2?: "modelId" };
 export interface Model {
   id: ModelID;
   friendly_name: string;
-  size_class: string;
-  data: ArrayBuffer;
+  size_class: EstimatorVariant;
   categories: CategoryMetadata[];
+
+  data: {
+    model: object;
+    scaler: MinMaxScalerData;
+    encoder: SerializedLabelEncoder;
+  };
 }
 
 type ModelItem = Record<ModelID, Model>;
 
-export type ModelInsertableUpdatable = Model & { id?: ModelID };
+export type ModelInsertableUpdatable = Omit<Model, "id">;
 
 /**
  * Updates a value in localforage using an update function.
@@ -149,7 +157,7 @@ export async function deleteCategory(id: CategoryID) {
  * @returns The ID of the created model.
  */
 export async function createModel(model: ModelInsertableUpdatable) {
-  const id = model.id ?? generateUUID();
+  const id = generateUUID();
   await update<ModelItem>("model", {}, (old) => ({
     ...old,
     [id]: { ...model, id } satisfies Model,

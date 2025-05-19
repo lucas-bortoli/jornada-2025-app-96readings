@@ -1,4 +1,4 @@
-interface SerializedLabelEncoder {
+export interface SerializedLabelEncoder {
   encoded: Record<string, number>;
   decoded: Record<number, string>;
 }
@@ -7,14 +7,22 @@ interface SerializedLabelEncoder {
  * A class for encoding and decoding categorical labels.
  */
 export default class LabelEncoder {
-  private encoded: Map<string, number>;
-  private decoded: Map<number, string>;
+  private encoded!: Map<string, number>;
+  private decoded!: Map<number, string>;
+
+  get categoryCount() {
+    return this.encoded.size;
+  }
+
+  get labels() {
+    return [...this.encoded.keys()];
+  }
 
   /**
    * Creates a LabelEncoder with the given target labels.
-   * @param targetLabels An array of unique label strings.
+   * @param targetLabels An array of label strings.
    */
-  constructor(targetLabels: string[]) {
+  compute(targetLabels: string[]) {
     const uniqueLabels = [...new Set(targetLabels)].toSorted((a, b) =>
       a.localeCompare(b, undefined, {
         numeric: true,
@@ -24,14 +32,6 @@ export default class LabelEncoder {
 
     this.encoded = new Map(uniqueLabels.map((f, value) => [f, value] as const));
     this.decoded = new Map(uniqueLabels.map((f, value) => [value, f] as const));
-  }
-
-  get categoryCount() {
-    return this.encoded.size;
-  }
-
-  get labels() {
-    return [...this.encoded.keys()];
   }
 
   /**
@@ -75,7 +75,7 @@ export default class LabelEncoder {
   }
 
   static fromJSON(json: SerializedLabelEncoder) {
-    const ce = new LabelEncoder([]);
+    const ce = new LabelEncoder();
 
     ce.encoded = new Map(Object.entries(json.encoded));
     ce.decoded = new Map(Object.entries(json.decoded).map(([k, v]) => [parseInt(k), v]));

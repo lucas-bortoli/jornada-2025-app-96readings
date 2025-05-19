@@ -1,11 +1,12 @@
 import * as tf from "@tensorflow/tfjs";
+import { gbus } from "../Lib/gbus_mini";
 import { ImperativeObject, notifyUpdate } from "../Lib/imperative_object";
 import { RunAsync } from "../Lib/run";
 import generateUUID from "../Lib/uuid";
 import { Category } from "../Storage";
 import LabelEncoder from "./label_encoder";
 import { shuffleArray } from "./rng_awful";
-import minMaxNormalizeTensor from "./tensor_min_max_normalize";
+import { default as MinMaxScaler } from "./tensor_min_max_normalize";
 import makeEstimator, { EstimatorVariant } from "./training/model_templates";
 
 export type DatasetX = [number, number, number, number, number];
@@ -35,15 +36,11 @@ export interface Progress {
   epochs: Epoch[];
 }
 
-export function progressPercentage(progress: Progress) {
-  if (progress.totalEpochs === 0) return 0;
-
-  return (progress.epochs.length - 1) / progress.totalEpochs;
-}
-
 export default class TrainingCycle implements ImperativeObject {
   public readonly uuid: string = generateUUID();
   public readonly estimator: tf.Sequential;
+  public readonly scaler: MinMaxScaler;
+  public readonly encoder: LabelEncoder;
   public readonly categories: Category[];
 
   public progress: Progress | null;
@@ -56,6 +53,8 @@ export default class TrainingCycle implements ImperativeObject {
 
     this.categories = categories;
     this.estimator = makeEstimator(variant, categories.length);
+    this.scaler = new MinMaxScaler();
+    this.encoder = new LabelEncoder();
     this.progress = null;
   }
 
@@ -83,12 +82,14 @@ export default class TrainingCycle implements ImperativeObject {
 
     dataset = shuffleArray(dataset, 1234);
 
-    const le = new LabelEncoder(dataset.map(y));
+    this.encoder.compute(dataset.map(y));
 
     const X_values = dataset.map(X);
-    const y_values_encoded = dataset.map(y).map((str) => le.encodeStringToInt(str));
+    const y_values_encoded = dataset.map(y).map((str) => this.encoder.encodeStringToInt(str));
 
-    const tX = minMaxNormalizeTensor(tf.tensor2d(X_values));
+    this.scaler.computeRange(tf.tensor2d(X_values));
+
+    const tX = this.scaler.transform(tf.tensor2d(X_values));
     const tY = tf.oneHot(tf.tensor1d(y_values_encoded, "int32"), this.categories.length);
 
     const totalEpochs = 10;
@@ -114,7 +115,11 @@ export default class TrainingCycle implements ImperativeObject {
           onTrainEnd: async (logs) => {
             console.log("🏁 Training complete!", logs);
 
-            this.progress!.state = "Complete";
+            this.progress = {
+              state: "Complete",
+              epochs: this.progress!.epochs,
+              totalEpochs: this.progress!.totalEpochs,
+            };
 
             notifyUpdate(this);
           },
@@ -168,6 +173,8 @@ export default class TrainingCycle implements ImperativeObject {
       });
 
       console.log("Finished training async callback.");
+      notifyUpdate(this);
+      gbus.publish("trainingComplete", { objectUUID: this.uuid });
     });
 
     notifyUpdate(this);
