@@ -1,5 +1,6 @@
 import localforage from "localforage";
 import { SerializedLabelEncoder } from "../Estimator/label_encoder";
+import { SerializedModel } from "../Estimator/serialization";
 import { MinMaxScalerData } from "../Estimator/tensor_min_max_normalize";
 import { EstimatorVariant } from "../Estimator/training/model_templates";
 import generateUUID, { UUID } from "../Lib/uuid";
@@ -47,7 +48,7 @@ export interface Model {
   categories: CategoryMetadata[];
 
   data: {
-    model: object;
+    model: SerializedModel;
     scaler: MinMaxScalerData;
     encoder: SerializedLabelEncoder;
   };
@@ -212,7 +213,7 @@ export async function updateModel(id: ModelID, patch: ModelInsertableUpdatable) 
  */
 export async function deleteModel(id: ModelID) {
   return update<ModelItem>("model", {}, (old) => {
-    const { [id]: _, ...rest } = old;
-    return rest;
+    delete old[id];
+    return old;
   });
 }

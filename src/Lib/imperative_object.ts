@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { gbus, useMiniGBus } from "./gbus_mini";
+import generateUUID, { UUID } from "./uuid";
 
-export type ObjectUUID = string & { _tag?: "objectUUID" };
+export type ObjectUUID = UUID<"ObjectUUID">;
+export const makeObjectUUID = () => generateUUID<ObjectUUID>();
 
 /**
  * Represents an imperative object with a unique identifier.

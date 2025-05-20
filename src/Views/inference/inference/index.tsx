@@ -1,9 +1,27 @@
+import { useEffect, useMemo } from "react";
+import CInference from "../../../Estimator/inference";
 import { cn } from "../../../Lib/class_names";
+import useObjectSubscription from "../../../Lib/imperative_object";
 import useKeepAwake from "../../../Lib/use_keep_awake";
+import { Model } from "../../../Storage";
 import style from "./style.module.css";
 
-export default function Inference() {
+interface InferenceProps {
+  model: Model;
+}
+
+export default function Inference(props: InferenceProps) {
   useKeepAwake();
+
+  const inference = useObjectSubscription(
+    useMemo(() => new CInference(props.model), [props.model])
+  );
+
+  useEffect(() => {
+    inference.init();
+  }, []);
+
+  const mostProbable = inference.latestPrediction?.toSorted((a, b) => b[1] - a[1]).at(0) ?? null;
 
   return (
     <div className="bg-grey-100 flex h-full w-full flex-col gap-4 overflow-y-scroll pb-8 font-serif">
@@ -19,17 +37,20 @@ export default function Inference() {
           Estimador
         </div>
       </section>
-      <section className="mx-4 flex flex-col items-center">
-        <h1 className="text-4xl">Canela</h1>
-        <span>85.1%</span>
-      </section>
+      {mostProbable && (
+        <section className="mx-4 flex flex-col items-center">
+          <h1 className="text-4xl">{mostProbable[0].friendly_name}</h1>
+          <span>{(mostProbable[1] * 100).toFixed(1)}%</span>
+        </section>
+      )}
+
       <section className="bg-grey-50 border-grey-800 shadow-pixel-sm mx-auto flex w-3/4 max-w-sm flex-col gap-2 border p-4">
         <table>
           <tbody>
-            {["Café", "Canela", "Chá", "Erva Mate"].map((item, I) => (
-              <tr key={item + I}>
-                <td>{item}</td>
-                <td className="text-end font-mono text-lg">{(Math.random() * 100).toFixed(1)}%</td>
+            {(inference.latestPrediction ?? []).map(([category, prob]) => (
+              <tr key={category.id}>
+                <td>{category.friendly_name}</td>
+                <td className="text-end font-mono text-lg">{(prob * 100).toFixed(1)}%</td>
               </tr>
             ))}
           </tbody>

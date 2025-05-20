@@ -1,23 +1,14 @@
 import * as tf from "@tensorflow/tfjs";
-import { gbus } from "../Lib/gbus_mini";
-import { ImperativeObject, notifyUpdate } from "../Lib/imperative_object";
-import { RunAsync } from "../Lib/run";
-import generateUUID from "../Lib/uuid";
-import { Category } from "../Storage";
-import LabelEncoder from "./label_encoder";
-import { shuffleArray } from "./rng_awful";
-import { default as MinMaxScaler } from "./tensor_min_max_normalize";
-import makeEstimator, { EstimatorVariant } from "./training/model_templates";
-
-export type DatasetX = [number, number, number, number, number];
-export type DatasetY = string;
-export type DatasetRow = [...DatasetX, DatasetY];
-
-export type DatasetYEncoded = number;
-export type DatasetRowEncoded = [...DatasetX, DatasetYEncoded];
-
-export const X = (xyRow: DatasetRow | DatasetRowEncoded) => xyRow.slice(0, 5) as DatasetX;
-export const y = <R extends DatasetRow | DatasetRowEncoded>(xyRow: R) => xyRow[5] as R[5];
+import { gbus } from "../../Lib/gbus_mini";
+import { ImperativeObject, notifyUpdate } from "../../Lib/imperative_object";
+import { RunAsync } from "../../Lib/run";
+import generateUUID from "../../Lib/uuid";
+import { Category } from "../../Storage";
+import { DatasetRow, X, y } from "../data_model";
+import LabelEncoder from "../label_encoder";
+import { shuffleArray } from "../rng_awful";
+import { default as MinMaxScaler } from "../tensor_min_max_normalize";
+import makeEstimator, { EstimatorVariant } from "../training/model_templates";
 
 export interface Epoch {
   accuracy: number;
@@ -91,6 +82,8 @@ export default class TrainingCycle implements ImperativeObject {
 
     const tX = this.scaler.transform(tf.tensor2d(X_values));
     const tY = tf.oneHot(tf.tensor1d(y_values_encoded, "int32"), this.categories.length);
+
+    console.log({ categories: this.categories, tY });
 
     const totalEpochs = 10;
 
@@ -175,6 +168,8 @@ export default class TrainingCycle implements ImperativeObject {
       console.log("Finished training async callback.");
       notifyUpdate(this);
       gbus.publish("trainingComplete", { objectUUID: this.uuid });
+
+      window.estimator = this.estimator;
     });
 
     notifyUpdate(this);

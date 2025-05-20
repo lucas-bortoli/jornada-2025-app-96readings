@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import useAlert from "../../Components/AlertDialog";
 import { useToast } from "../../Components/Toast";
+import { serializeModel } from "../../Estimator/serialization";
 import { EstimatorVariant } from "../../Estimator/training/model_templates";
-import TrainingCycle from "../../Estimator/training_cycle";
+import TrainingCycle from "../../Estimator/training/training_cycle";
 import useProvideCurrentWindow from "../../Lib/compass_navigator/window_container/use_provide_current_window";
 import delay from "../../Lib/delay";
 import { useMiniGBusSubscription } from "../../Lib/gbus_mini";
@@ -71,7 +72,7 @@ export default function Training(props: TrainingProps) {
       friendly_name: props.friendlyName,
       categories: props.categories,
       data: {
-        model: training.estimator.toJSON(null, false) as object,
+        model: await serializeModel(training.estimator),
         scaler: training.scaler.toJSON(),
         encoder: training.encoder.toJSON(),
       },
