@@ -19,6 +19,8 @@ export default function Inference(props: InferenceProps) {
 
   useEffect(() => {
     inference.init();
+
+    return () => inference.onUnmount();
   }, []);
 
   const mostProbable = inference.latestPrediction?.toSorted((a, b) => b[1] - a[1]).at(0) ?? null;
