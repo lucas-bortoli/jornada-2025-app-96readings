@@ -4,7 +4,7 @@ export type EstimatorVariant = "mini" | "small" | "medium" | "large";
 
 /**
  * Creates a TensorFlow.js model with a specified size (mini, small, medium, large).
- * The model is designed for multi-class classification with 4 input features.
+ * The model is designed for multi-class classification with 5 input features.
  *
  * @param size The size of the model to create.
  * @param numClasses How many classes will this model learn? This information is important for the model's output layer.
