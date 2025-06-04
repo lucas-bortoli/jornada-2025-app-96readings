@@ -17,6 +17,9 @@ import IconAddDirectory16 from "./AddDirectory16.png";
 import IconSensorReading16 from "./SensorReading16.png";
 import IconEgg512 from "./Egg512.png";
 import IconEgg256 from "./Egg256.png";
+import IconBluetooth128 from "./Bluetooth128.png";
+import IconMethanediol128 from "./Methanediol128.png";
+import IconNetwork128 from "./Network128.png";
 import { CSSProperties } from "react";
 
 const Icons = {
@@ -38,6 +41,9 @@ const Icons = {
   SensorReading16: [IconSensorReading16, 16],
   Egg512: [IconEgg512, 512],
   Egg256: [IconEgg256, 256],
+  Bluetooth128: [IconBluetooth128, 128],
+  Methanediol128: [IconMethanediol128, 128],
+  Network128: [IconNetwork128, 128],
 } as const;
 
 export type IconName = keyof typeof Icons;

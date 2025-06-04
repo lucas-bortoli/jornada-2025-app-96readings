@@ -1,11 +1,14 @@
 import AppFooter from "../../Components/AppFooter";
 import Button from "../../Components/Button";
+import SpriteIcon from "../../Components/SpriteIcon";
+import { cn } from "../../Lib/class_names";
 import { manifest, useWindowing } from "../../Lib/compass_navigator";
 import { AboutWindow } from "../about/_windows";
 import { CategoryListWindow } from "../category_management/_windows";
 import { ConnectionWindow } from "../connection/_windows";
 import { InferenceSetupWindow } from "../inference/_windows";
 import { NewEstimatorPageWindow } from "../training_view/windows";
+import style from "./style.module.css";
 
 export default function HomePage() {
   const windowing = useWindowing();
@@ -38,20 +41,35 @@ export default function HomePage() {
         <h1 className="text-xl">Home Page</h1>
       </nav>
       <section className="flex flex-col items-stretch gap-2 px-4">
-        <Button className="p-24 text-2xl" onClick={openPage.bind(null, "Connection")}>
-          Conexão
+        <Button
+          className={cn("relative h-32 overflow-hidden text-xl", style.menuButton)}
+          onClick={openPage.bind(null, "Connection")}>
+          <SpriteIcon name="Bluetooth128" className="absolute top-1/2 right-4 -translate-y-1/2" />
+          <span className="absolute bottom-1 left-2">Conexão</span>
         </Button>
-        <Button className="p-24 text-2xl" onClick={openPage.bind(null, "CategoryManagement")}>
-          Categorias e Substâncias
+        <Button
+          className={cn("relative h-32 text-xl", style.menuButton)}
+          onClick={openPage.bind(null, "CategoryManagement")}>
+          <SpriteIcon name="Methanediol128" className="absolute top-1/2 right-4 -translate-y-1/2" />
+          <span className="absolute bottom-1 left-2">Substâncias</span>
         </Button>
-        <Button className="p-24 text-2xl" onClick={openPage.bind(null, "Training")}>
-          Treinamento
-        </Button>
-        <Button className="p-24 text-2xl" onClick={openPage.bind(null, "Classification")}>
-          Classificação
-        </Button>
-        <Button className="p-24 text-2xl" onClick={openPage.bind(null, "About")}>
-          Sobre o Aplicativo
+        <div className="flex w-full gap-2">
+          <Button
+            className={cn("relative h-32 shrink grow basis-0 text-xl", style.menuButton)}
+            onClick={openPage.bind(null, "Training")}>
+            <SpriteIcon name="Network128" className="absolute top-1/2 right-4 -translate-y-1/2" />
+            <span className="absolute bottom-1 left-2">Treinamento</span>
+          </Button>
+          <Button
+            className={cn("relative h-32 shrink grow basis-0 text-xl", style.menuButton)}
+            onClick={openPage.bind(null, "Classification")}>
+            <span className="absolute bottom-1 left-2">Classificação</span>
+          </Button>
+        </div>
+        <Button
+          className={cn("relative h-32 text-xl", style.menuButton)}
+          onClick={openPage.bind(null, "About")}>
+          <span className="absolute bottom-1 left-2">Sobre o Sistema</span>
         </Button>
       </section>
       <AppFooter />
